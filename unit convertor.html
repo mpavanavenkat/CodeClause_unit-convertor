@@ -46,3 +46,463 @@
   <script src="script.js"></script>
 </body>
 </html>
+
+
+
+
+
+
+Task 2
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Standard Chartered Clone</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background: #000000;
+            margin: 0;
+            padding: 0;
+        }
+        .navbar-brand img {
+            height: 48px;
+        }
+        .slogan-section {
+            background: url('../task2/gettyimages-1314714058-1024x1024.jpg') no-repeat center center;
+            background-size: cover;
+            min-height: 37vw;
+            color: #000000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            margin: 0;
+            padding: 0;
+        }
+        .slogan-section::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+        }
+        .slogan-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            margin-top: 40px;
+        }
+        .main-slogan {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #f5f5f5;
+        }
+        .sub-slogan {
+            font-size: 1.25rem;
+            color: #e0e0e0;
+            margin-top: 1.5rem;
+        }
+        .btn-learn {
+            background: #0086ff;
+            color: #fff;
+            font-weight: 600;
+            border-radius: 2rem;
+            padding: 0.7rem 2.5rem;
+            margin-top: 2rem;
+        }
+        .custom-navbar {
+            background: #fff;
+            box-shadow: 0 1px 8px rgba(0,0,0,0.07);
+        }
+       .sc-black-pillbar {
+  background: #313437;
+  border-radius: 24px;
+  padding: 10px 36px;
+  margin-top: 0px;
+
+  margin-right: 0; /* Absolutely right inside .container */
+  
+  display: flex;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+}
+.sc-link {
+  color: #fff;
+  text-decoration: none;
+  font-size: 1.17rem;
+  font-weight: 600;
+  margin: 0 13px;
+  transition: color 0.18s;
+}
+.sc-link:hover {
+  color: #51e49d;
+  text-decoration: underline;
+}
+.sc-div {
+  color: #fff;
+  margin: 0.7px;
+  font-size: 1.15rem;
+}
+
+
+        .logo-text {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .logo-sample {
+            height: 80px;
+            margin-right: 40px !important;
+        }
+        
+        .search-icon {
+            margin-left: 16px;
+            font-size: 1.3rem;
+        }
+        .cookie-btn {
+            position: fixed;
+            left: 16px;
+            bottom: 16px;
+            z-index: 100;
+            background: #0f0;
+            border-radius: 50%;
+            width: 46px;
+            height: 46px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .cookie-btn span {
+            font-size: 1.8rem;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top dark links -->
+    <!-- Top Black NavBar BEGIN -->
+<!-- Top pill-shaped navbar, right aligned INSIDE the content area -->
+<div class="container mt-3">
+  <div class="d-flex justify-content-end">
+    <div class="sc-black-pillbar d-flex align-items-center">
+      <a href="#" class="sc-link">Online banking</a>
+      <span class="sc-div">|</span>
+      <a href="#" class="sc-link">Private banking online</a>
+      <span class="sc-div">|</span>
+      <a href="#" class="sc-link">Straight2Bank</a>
+      <span class="sc-div">|</span>
+      <a href="#" class="sc-link">Local sites</a>
+      <span class="sc-div">|</span>
+      <a href="#" class="sc-link">Contact us</a>
+    </div>
+  </div>
+</div>
+
+
+
+
+<!-- Top Black NavBar END -->
+
+
+    <!-- Main Navigation -->
+    <nav class="navbar navbar-expand-lg custom-navbar py-2">
+      <div class="container-fluid">
+        <div class="logo-text">
+    <img src="https://logos-world.net/wp-content/uploads/2023/02/Standard-Chartered-Logo.png" alt="Logo" class="logo-sample">
+    
+</div>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navlinks">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navlinks">
+          <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+            <li class="nav-item"><a class="nav-link" href="#">About us</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Corporate & Investment</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Wealth & Retail</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Ventures</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Investors</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Insights</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Media</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Careers</a></li>
+            <li class="nav-item">
+                <a class="nav-link search-icon" href="#"><span>&#128269;</span></a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <!-- Hero / Slogan Section -->
+    <section class="slogan-section" style="background-image:url('https://jacoblund.com/cdn/shop/products/249c9e601ea00985ac371e8d4890440a_grande.jpg?v=1689776631');">
+        <div class="slogan-content">
+            <h1 class="main-slogan">
+                From here, possibilities are<br>
+                <span class="everywhere"> everywhere</span>
+            </h1>
+            <p class="sub-slogan">
+                We’re here to connect your potential to possibilities in the world’s most <br>
+                <span class="dynamic-markets">dynamic markets.</span>
+            </p>
+            <a href="#" class="btn btn-learn">Learn how</a>
+        </div>
+    </section>
+    <!-- Cookie icon/button -->
+    <div class="cookie-btn">
+        <span>&#9881;</span>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+JS Use case
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Customer Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        body {
+            display: flex;
+            justify-content: center; /* Centers content horizontally */
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            background: #f9f9f9;
+        }
+
+        .container {
+            max-width: 7000px;
+            width: 100%; /* Responsive */
+            background: white;
+            padding: 30px 40px;
+            border-radius: 8px;
+            box-shadow: 0 0 12px rgba(0,0,0,0.05);
+        }
+
+        .input-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 18px;
+            flex-wrap: wrap; /* Wrap on smaller screens */
+        }
+
+        .form-label-custom {
+            min-width: 140px;
+            font-weight: bold;
+            text-align: right;
+            margin-right: 20px;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .input-wrap {
+            flex: 1 1 300px; /* Grow, shrink, base width 300px */
+        }
+
+        input.form-control,
+        select.form-select {
+            width: 100%; /* full width of input-wrap */
+            font-size: 1.1rem;
+            height: 44px;
+            padding: 0 12px;
+            box-sizing: border-box;
+            border-radius: 4px;
+            border: 1px solid #ced4da;
+            transition: border-color 0.3s ease-in-out;
+        }
+
+        input.form-control:focus,
+        select.form-select:focus {
+            border-color: #86b7fe;
+            outline: 0;
+            box-shadow: 0 0 0 0.25rem rgba(13,110,253,.25);
+        }
+
+        .btn-align-left {
+            margin-left: 160px; /* Align with input fields */
+            margin-top: 10px;
+            font-size: 1.15rem;
+            padding: 8px 28px;
+            cursor: pointer;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 0.9rem;
+            margin-top: 4px;
+            min-height: 18px;
+        }
+
+        h3, h4 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        table#customerTable {
+            width: 100%;
+            font-size: 1rem;
+            margin-top: 35px;
+        }
+
+        @media (max-width: 640px) {
+            .input-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .form-label-custom {
+                text-align: left;
+                margin-bottom: 6px;
+                min-width: auto;
+            }
+            .btn-align-left {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h3>Add Customer</h3>
+    <form id="customerForm" novalidate>
+        <div class="input-row">
+            <label for="name" class="form-label-custom">Name:</label>
+            <div class="input-wrap">
+                <input type="text" class="form-control" id="name" placeholder="Enter Name" />
+                <div id="nameError" class="error-message"></div>
+            </div>
+        </div>
+        <div class="input-row">
+            <label for="email" class="form-label-custom">Email Id:</label>
+            <div class="input-wrap">
+                <input type="email" class="form-control" id="email" placeholder="Enter email" />
+                <div id="emailError" class="error-message"></div>
+            </div>
+        </div>
+        <div class="input-row">
+            <label for="contact" class="form-label-custom">Contact No:</label>
+            <div class="input-wrap">
+                <input type="text" class="form-control" id="contact" placeholder="Enter contact no" maxlength="10" />
+                <div id="contactError" class="error-message"></div>
+            </div>
+        </div>
+        <div class="input-row">
+            <label for="accountType" class="form-label-custom">Account Type:</label>
+            <div class="input-wrap">
+                <select class="form-select" id="accountType">
+                    <option value="">Select account type</option>
+                    <option value="savings">Savings</option>
+                    <option value="current">Current</option>
+                </select>
+                <div id="accountTypeError" class="error-message"></div>
+            </div>
+        </div>
+        <button type="button" id="addCustomerBtn" class="btn btn-primary btn-align-left">Add Customer</button>
+    </form>
+
+    <h4>Customer List</h4>
+    <table class="table table-bordered" id="customerTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Contact</th>
+                <th>Account Type</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Rows added here -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    const nameInput = document.getElementById('name');
+    const emailInput = document.getElementById('email');
+    const contactInput = document.getElementById('contact');
+    const accountTypeInput = document.getElementById('accountType');
+
+    const nameError = document.getElementById('nameError');
+    const emailError = document.getElementById('emailError');
+    const contactError = document.getElementById('contactError');
+    const accountTypeError = document.getElementById('accountTypeError');
+
+    const customerTableBody = document.querySelector('#customerTable tbody');
+
+    function validateName(name) {
+        return /^[A-Za-z\s]+$/.test(name);
+    }
+
+    function validateEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    function validateContact(contact) {
+        return /^[7-9]\d{9}$/.test(contact);
+    }
+
+    function validateAccountType(accountType) {
+        return accountType !== "";
+    }
+
+    function clearErrors() {
+        nameError.textContent = '';
+        emailError.textContent = '';
+        contactError.textContent = '';
+        accountTypeError.textContent = '';
+    }
+
+    function addCustomerToTable(customer) {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${customer.name}</td>
+            <td>${customer.email}</td>
+            <td>${customer.contact}</td>
+            <td>${customer.accountType}</td>
+        `;
+        customerTableBody.appendChild(row);
+    }
+
+    document.getElementById('addCustomerBtn').addEventListener('click', () => {
+        clearErrors();
+
+        const name = nameInput.value.trim();
+        const email = emailInput.value.trim();
+        const contact = contactInput.value.trim();
+        const accountType = accountTypeInput.value;
+
+        let isValid = true;
+
+        if (!validateName(name)) {
+            nameError.textContent = 'Please enter only alphabets';
+            isValid = false;
+        }
+        if (!validateEmail(email)) {
+            emailError.textContent = 'Please enter a valid email id';
+            isValid = false;
+        }
+        if (!validateContact(contact)) {
+            contactError.textContent = 'Contact no should be 10 digits and start with 7-9';
+            isValid = false;
+        }
+        if (!validateAccountType(accountType)) {
+            accountTypeError.textContent = 'Please select an account type';
+            isValid = false;
+        }
+
+        if (isValid) {
+            const customer = { name, email, contact, accountType };
+            addCustomerToTable(customer);
+            document.getElementById('customerForm').reset();
+        }
+    });
+</script>
+</body>
+</html>
+
