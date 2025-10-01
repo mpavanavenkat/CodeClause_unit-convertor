@@ -49,444 +49,177 @@
 
 
 
+CustomerDetails.js
 
-jsusecase2
+import React from 'react';
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Testimonials Page</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-
-    
-    <div class="form-container">
-        <form id="testimonial-form">
-            <div class="form-group">
-                <label for="name">Name</label>
-                <input type="text" id="name" placeholder="Your Name" required>
-            </div>
-            <div class="form-group">
-                <label for="message">Message</label>
-                <input type="text" id="message" placeholder="Enter your Message" required>
-            </div>
-            <button type="submit">Submit</button>
-        </form>
+const CustomerDetails = ({ customer }) => {
+  if (!customer) {
+    return <div><h3>Customer Details</h3><p>Select a customer to view details.</p></div>;
+  }
+  return (
+    <div>
+      <h3>Customer Details</h3>
+      <p><strong>ID :</strong> {customer.id}</p>
+      <p><strong>First Name :</strong> {customer.firstName}</p>
+      <p><strong>Last Name :</strong> {customer.lastName}</p>
+      <p><strong>Email :</strong> {customer.email}</p>
     </div>
+  );
+};
 
-    <div class="testimonials-container">
-        <h2>Testimonials</h2>
-        <div id="testimonials-list">
-            <div class="testimonial-card">
-                <div class="testimonial-content">
-                    <h3 class="name-display">Ritu</h3>
-                    <p class="message-display">It has been a positive experience with personable banking service in a timely manner</p>
-                </div>
-                <div class="testimonial-actions">
-                    <span class="edit-btn">Edit</span> | <span class="delete-btn">Delete</span>
-                </div>
-            </div>
-            </div>
-    </div>
+export default CustomerDetails;
 
-    <script src="script.js"></script>
-</body>
-</html>
+CustomerForm.js
 
+import React, { useState } from 'react';
 
+const CustomerForm = ({ onAddCustomer }) => {
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: ''
+  });
 
-/* General Body Styles */
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f2f5;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 30px; /* Added a bit more space around */
-    color: #333;
-    font-size: 18px; /* Increased base font size from default */
-}
-
-/* Task Description Box */
-.task-description {
-    background-color: #1e60de;
-    color: white;
-    padding: 20px 30px; /* Increased padding */
-    border-radius: 15px;
-    margin-bottom: 30px;
-    max-width: 800px; /* WIDER */
-    text-align: left;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    font-size: 1.1em; /* Larger text */
-}
-
-/* Form Container */
-.form-container {
-    border: 1px solid #ccc;
-    padding: 30px; /* Increased padding */
-    margin-bottom: 30px;
-    background-color: #fff;
-    width: 100%;
-    max-width: 800px; /* WIDER */
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-#testimonial-form .form-group {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px; /* Increased margin */
-}
-
-#testimonial-form label {
-    background-color: #1e60de;
-    color: white;
-    padding: 12px 18px; /* Increased padding */
-    margin-right: 15px;
-    min-width: 100px; /* Increased min-width */
-    text-align: center;
-    font-weight: bold;
-}
-
-#testimonial-form input {
-    flex-grow: 1;
-    padding: 12px; /* Increased padding */
-    border: 1px solid #ccc;
-    font-size: 1em; /* Ensure input font size scales */
-}
-
-#testimonial-form button[type="submit"] {
-    background-color: #28a745;
-    color: white;
-    border: none;
-    padding: 12px 24px; /* Increased padding */
-    cursor: pointer;
-    font-size: 1.1em; /* Larger button text */
-    font-weight: bold;
-}
-
-/* Testimonials Section */
-.testimonials-container {
-    border: 1px solid #ccc;
-    padding: 30px; /* Increased padding */
-    background-color: #fff;
-    width: 100%;
-    max-width: 800px; /* WIDER */
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.testimonials-container h2 {
-    margin-top: 0;
-    margin-bottom: 25px;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 15px;
-    font-size: 1.8em; /* Larger "Testimonials" header */
-}
-
-#testimonials-list {
-    display: flex;
-    flex-direction: column;
-    gap: 20px; /* Increased gap */
-}
-
-.testimonial-card {
-    border: 1px solid #ddd;
-    border-radius: 15px;
-    padding: 20px; /* Increased padding */
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    background-color: #f9f9f9;
-}
-
-.testimonial-content {
-    flex-grow: 1;
-    margin-right: 20px;
-}
-
-.testimonial-content h3 {
-    margin: 0 0 8px 0;
-    font-size: 1.4em; /* Larger name */
-}
-
-.testimonial-content p {
-    margin: 0;
-    color: #555;
-    display: block;
-    line-height: 1.6; /* Improved readability */
-}
-
-/* Edit/Delete Button Container */
-.testimonial-actions {
-    background-color: #28a745;
-    color: white;
-    padding: 10px 18px; /* Increased padding */
-    border-radius: 5px;
-    white-space: nowrap;
-    cursor: default;
-    font-weight: bold;
-}
-
-.testimonial-actions span {
-    cursor: pointer;
-}
-
-/* Styles for when a card is in editing mode */
-.testimonial-card.editing .name-display,
-.testimonial-card.editing .message-display {
-    display: none; /* Hide original text */
-}
-
-.edit-name, .edit-message {
-    display: none; /* Hide input fields by default */
-    width: 95%;
-    padding: 8px; /* Increased padding */
-    margin-bottom: 8px;
-    border: 1px solid #ccc;
-    border-radius: 3px;
-    font-family: Arial, sans-serif;
-    font-size: 1em;
-}
-
-.testimonial-card.editing .edit-name,
-.testimonial-card.editing .edit-message {
-    display: block; /* Show input fields when editing */
-}
-
-
-
-document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('testimonial-form');
-    const testimonialsList = document.getElementById('testimonials-list');
-
-    // Handle form submission to ADD a new testimonial
-    form.addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevent page from reloading
-
-        const name = document.getElementById('name').value.trim();
-        const message = document.getElementById('message').value.trim();
-
-        if (name === '' || message === '') {
-            alert('Please fill in both name and message fields.');
-            return;
-        }
-
-        createTestimonial(name, message);
-        form.reset(); // Clear the form fields
-    });
-
-    // Function to CREATE a new testimonial card
-    function createTestimonial(name, message) {
-        // Create the main card container
-        const card = document.createElement('div');
-        card.className = 'testimonial-card';
-
-        // Create the content div
-        const contentDiv = document.createElement('div');
-        contentDiv.className = 'testimonial-content';
-        
-        // Create and append name
-        const nameEl = document.createElement('h3');
-        nameEl.className = 'name-display';
-        nameEl.textContent = name;
-        contentDiv.appendChild(nameEl);
-
-        // Create and append message
-        const messageEl = document.createElement('p');
-        messageEl.className = 'message-display';
-        messageEl.textContent = message;
-        contentDiv.appendChild(messageEl);
-        
-        // Create the action buttons container
-        const actionsDiv = document.createElement('div');
-        actionsDiv.className = 'testimonial-actions';
-
-        const editSpan = document.createElement('span');
-        editSpan.className = 'edit-btn';
-        editSpan.textContent = 'Edit';
-        
-        const deleteSpan = document.createElement('span');
-        deleteSpan.className = 'delete-btn';
-        deleteSpan.textContent = 'Delete';
-        
-        // Add elements and text separator to actions div
-        actionsDiv.appendChild(editSpan);
-        actionsDiv.append(' | ');
-        actionsDiv.appendChild(deleteSpan);
-
-        // Add event listeners for the new buttons
-        editSpan.addEventListener('click', handleEdit);
-        deleteSpan.addEventListener('click', handleDelete);
-
-        // Add content and actions to the card
-        card.appendChild(contentDiv);
-        card.appendChild(actionsDiv);
-
-        // Add the new card to the list
-        testimonialsList.appendChild(card);
-    }
-
-    // Handler for DELETE functionality
-    function handleDelete(event) {
-        const card = event.target.closest('.testimonial-card');
-        card.remove();
-    }
-
-    // Handler for EDIT/SAVE functionality
-    function handleEdit(event) {
-        const card = event.target.closest('.testimonial-card');
-        const contentDiv = card.querySelector('.testimonial-content');
-        const nameEl = contentDiv.querySelector('.name-display');
-        const messageEl = contentDiv.querySelector('.message-display');
-        const editBtn = card.querySelector('.edit-btn');
-
-        const isEditing = card.classList.contains('editing');
-
-        if (isEditing) {
-            // --- SAVE logic ---
-            const nameInput = contentDiv.querySelector('.edit-name');
-            const messageInput = contentDiv.querySelector('.edit-message');
-
-            // Update display elements with new values
-            nameEl.textContent = nameInput.value;
-            messageEl.textContent = messageInput.value;
-
-            // Remove input fields
-            contentDiv.removeChild(nameInput);
-            contentDiv.removeChild(messageInput);
-
-            // Toggle back to non-editing state
-            editBtn.textContent = 'Edit';
-            card.classList.remove('editing');
-        } else {
-            // --- EDIT logic ---
-            // Create input for name
-            const nameInput = document.createElement('input');
-            nameInput.type = 'text';
-            nameInput.className = 'edit-name';
-            nameInput.value = nameEl.textContent;
-            contentDiv.insertBefore(nameInput, nameEl);
-
-            // Create textarea for message
-            const messageInput = document.createElement('textarea');
-            messageInput.className = 'edit-message';
-            messageInput.value = messageEl.textContent;
-            messageInput.rows = 3;
-            contentDiv.insertBefore(messageInput, messageEl);
-
-            // Toggle to editing state
-            editBtn.textContent = 'Save';
-            card.classList.add('editing');
-        }
-    }
-    
-    // Add listeners to the pre-existing testimonial's buttons
-    document.querySelectorAll('.edit-btn').forEach(btn => btn.addEventListener('click', handleEdit));
-    document.querySelectorAll('.delete-btn').forEach(btn => btn.addEventListener('click', handleDelete));
-});
-
-
-import React from "react";
-
-function Alert() {
-  const handleClick = () => {
-    alert("React is a great UI library");
+  const handleChange = (e) => {
+    setFormData({...formData, [e.target.name]: e.target.value });
   };
 
-  return <button onClick={handleClick}>Click me Please</button>;
-}
+  const handleSubmit = (e) => {
+  e.preventDefault();
+  if (
+    formData.firstName &&
+    formData.lastName &&
+    formData.email &&
+    formData.email.endsWith("@gmail.com")
+  ) {
+    onAddCustomer(formData);
+    setFormData({ firstName: "", lastName: "", email: "" });
+  } else {
+    alert("Please enter a valid Gmail address (ending with @gmail.com).");
+  }
+};
 
-export default Alert;
 
+  return (
+    <div>
+      <h3>Add Customer</h3>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label>First Name</label><br />
+          <input name="firstName" value={formData.firstName} onChange={handleChange} />
+        </div>
+        <div>
+          <label>Last Name</label><br />
+          <input name="lastName" value={formData.lastName} onChange={handleChange} />
+        </div>
+        <div>
+          <label>Email</label><br />
+          <input name="email" value={formData.email} onChange={handleChange} />
+        </div><br />
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+  );
+};
+
+export default CustomerForm;
+
+CustomerList.js
+
+import React from 'react';
+
+const CustomerList = ({ customers, onSelect }) => {
+  return (
+    <div>
+      <h3>Customers List</h3>
+      <table border="1" cellPadding="5" cellSpacing="0" style={{ borderCollapse: 'collapse', width: '100%' }}>
+        <thead>
+          <tr style={{ backgroundColor: '#f0f0f0' }}>
+            <th>Id</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+          </tr>
+        </thead>
+        <tbody>
+          {customers.map((cust) => (
+            <tr 
+              key={cust.id} 
+              onClick={() => onSelect(cust)} 
+              style={{ cursor: 'pointer' }} 
+              className="table-row"
+            >
+              <td>{cust.id}</td>
+              <td>{cust.firstName}</td>
+              <td>{cust.lastName}</td>
+              <td>{cust.email}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <style jsx>{`
+        .table-row:hover {
+          background-color: #d3d3d3;
+        }
+      `}</style>
+    </div>
+  );
+};
+
+export default CustomerList;
+
+App.js
 
 import React, { useState, useEffect } from "react";
+import CustomerList from "./components/CustomerList";
+import CustomerForm from "./components/CustomerForm";
+import CustomerDetails from "./components/CustomerDetails";
+import customersData from "./customers.json";
 
-function Counter() {
-  const [seconds, setSeconds] = useState(0);
+const App = () => {
+  const [customers, setCustomers] = useState([]);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setSeconds((prev) => prev + 1);
-    }, 1000);
-
-    return () => clearInterval(timer);
+    setCustomers(customersData);
   }, []);
 
-  return <p>Time Elapsed : {seconds}</p>;
-}
+  const handleSelectCustomer = (customer) => {
+    setSelectedCustomer(customer);
+  };
 
-export default Counter;
+  const handleAddCustomer = (newCustomer) => {
+    const newId = customers.length ? customers[customers.length - 1].id + 1 : 1;
+    const customerToAdd = { id: newId, ...newCustomer };
+    setCustomers([...customers, customerToAdd]);
+    setSelectedCustomer(customerToAdd);
+  };
 
-
-import React from "react";
-
-function HelloMessage({ name, message = "Hi, Hello" }) {
   return (
-    <p>
-      Message from <b>{name}</b> : {message}
-    </p>
-  );
-}
-
-export default HelloMessage;
-
-
-import React from "react";
-
-function HelloWorld() {
-  return <p>Hello World Component</p>;
-}
-
-export default HelloWorld;
-
-
-
-import React from "react";
-import HelloWorld from "./Components/HelloWorld";
-import HelloMessage from "./Components/HelloMessage";
-import Counter from "./Components/Counter";
-import Alert from "./Components/Alert";
-
-function App() {
-  return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        minHeight: "100vh",
-        backgroundColor: "#f9f9f9",
-      }}
-    >
-      <div
-        style={{
-          border: "2px solid skyblue",
-          padding: "20px",
-          width: "500px",
-          backgroundColor: "white",
-        }}
-      >
-        <h3>UseCase 1 - Components, Props and States</h3>
-        <hr />
-
-        <HelloWorld />
-
-        <h5>Single Prop</h5>
-        <HelloMessage name="Euler" />
-
-        <h5>Multiple Props</h5>
-        <HelloMessage name="Ramanujam" message="I got this in my dreams" />
-
-        <h5>State and Virtual DOM</h5>
-        <Counter />
-
-        <h5>Interactive Component - Event Handling</h5>
-        <Alert />
+    <div style={{ marginLeft: 50, marginRight: 50 }}>
+      <CustomerList customers={customers} onSelect={handleSelectCustomer} />
+      <div style={{ display: "flex", justifyContent: "space-between", marginTop: 20 }}>
+        <div style={{ width: "45%" }}>
+          <CustomerForm onAddCustomer={handleAddCustomer} />
+        </div>
+        <div style={{ width: "45%" }}>
+          <CustomerDetails customer={selectedCustomer} />
+        </div>
       </div>
     </div>
   );
-}
+};
 
 export default App;
+
+
+customers.json
+
+[
+  { "id": 1, "firstName": "Sundar", "lastName": "Pichai", "email": "sundar.pichai@google.com" },
+  { "id": 2, "firstName": "Satya", "lastName": "Nadella", "email": "satya.nadella@microsoft.com" },
+  { "id": 3, "firstName": "Jeff", "lastName": "Bezos", "email": "jeff.bezos@amazon.com" },
+  { "id": 4, "firstName": "Sergey", "lastName": "Brin", "email": "sergey.brin@google.com" },
+  { "id": 5, "firstName": "Larry", "lastName": "Page", "email": "larry.page@google.com" }
+]
