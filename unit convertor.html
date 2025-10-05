@@ -223,3 +223,315 @@ customers.json
   { "id": 4, "firstName": "Sergey", "lastName": "Brin", "email": "sergey.brin@google.com" },
   { "id": 5, "firstName": "Larry", "lastName": "Page", "email": "larry.page@google.com" }
 ]
+
+
+
+Wire frame code
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Payroll Payments</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="navbar">
+    <span class="nav-back">&lt; Back</span>
+    <span class="nav-home">🏠 Straight2Bank</span>
+    <span class="nav-search">
+      <input type="text" placeholder="Search">
+    </span>
+    <span class="nav-user">Welcome User <span class="nav-avatar">👤</span></span>
+  </div>
+  <div class="main">
+    <h2 class="heading">Payroll Payments</h2>
+    <div class="instruction-box">
+      <div class="instruction-row">
+        <div class="form-group">
+          <label>Debit Account</label>
+          <select><option>Select</option></select>
+        </div>
+        <div class="form-group">
+          <label>Date</label>
+          <select><option>Select</option></select>
+        </div>
+        <div class="form-group">
+          <label>Payroll Type</label>
+          <button class="btn-domestic">Domestic</button>
+        </div>
+        <div class="form-group">
+          <label>Payment Currency</label>
+          <select><option>Select</option></select>
+        </div>
+      </div>
+    </div>
+    <div class="payment-details">
+      <div class="pd-header">
+        <span>Payment Details</span>
+        <button class="btn-upload">Upload File</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Employee ID</th>
+            <th>Name</th>
+            <th>Salary Amount</th>
+            <th>Currency</th>
+            <th>Account Number</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>101</td>
+            <td>John</td>
+            <td>50000</td>
+            <td>INR</td>
+            <td>12345678</td>
+            <td><span class="delete-btn">🗑</span></td>
+          </tr>
+          <tr>
+            <td>102</td>
+            <td>Alice</td>
+            <td>52000</td>
+            <td>INR</td>
+            <td>22334455</td>
+            <td><span class="delete-btn">🗑</span></td>
+          </tr>
+          <tr>
+            <td>103</td>
+            <td>Rahul</td>
+            <td>47000</td>
+            <td>INR</td>
+            <td>33445566</td>
+            <td><span class="delete-btn">🗑</span></td>
+          </tr>
+          <tr>
+            <td>104</td>
+            <td>Mary</td>
+            <td>51000</td>
+            <td>INR</td>
+            <td>44556677</td>
+            <td><span class="delete-btn">🗑</span></td>
+          </tr>
+          <tr>
+            <td>105</td>
+            <td>Vikram</td>
+            <td>48000</td>
+            <td>INR</td>
+            <td>55667788</td>
+            <td><span class="delete-btn">🗑</span></td>
+          </tr>
+          <tr>
+            <td>106</td>
+            <td>Linda</td>
+            <td>53000</td>
+            <td>INR</td>
+            <td>66778899</td>
+            <td><span class="delete-btn">🗑</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="summary-box">
+  <div>Total Employees: <span>6</span></div>
+  <div>Total Debit Amount: <span>301000</span></div>
+</div>
+
+<!-- Buttons directly below summary -->
+<div class="button-row">
+  <button class="btn-main">Submit for Approval</button>
+  <button class="btn-main">Save Draft</button>
+  <button class="btn-main">Clear Form</button>
+  <button class="btn-main">Cancel</button>
+</div>
+
+
+  <div class="footer">
+    <span>Menu</span>
+    <span></span>
+    <span class="footer-help">Help</span>
+    <span>Log Out</span>
+    <span class="footer-next">&rarr;</span>
+  </div>
+</body>
+</html>
+
+Css
+
+body {
+  background: #f3f3f9;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar {
+  background: #2769e7;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 30px;
+  font-size: 16px;
+  height: 60px;
+}
+
+.nav-back { margin-right: 20px; cursor: pointer; }
+.nav-home { font-weight: bold; margin-right: auto; margin-left: 20px; }
+.nav-search input { border-radius: 5px; border: none; padding: 5px 10px; }
+.nav-user { margin-left: 30px; }
+.nav-avatar { margin-left: 7px; }
+
+.main {
+  width: 85vw;
+  margin: 30px auto 0 auto;
+}
+
+.heading {
+  text-align: center;
+  color: #fff;
+  background: #347dfa;
+  margin: 0 auto 15px auto;
+  padding: 14px 0;
+  border-radius: 8px 8px 0 0;
+  font-size: 2rem;
+}
+
+.instruction-box {
+  background: #e6e6ed;
+  padding: 20px 30px 10px 30px;
+  border-radius: 10px;
+  margin-bottom: 25px;
+}
+
+.instruction-row {
+  display: flex;
+  gap: 30px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+}
+.form-group label {
+  font-weight: bold;
+  margin-bottom: 7px;
+}
+.form-group select, .form-group button {
+  padding: 7px;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+}
+
+.btn-domestic {
+  background: #2869e7;
+  color: #fff;
+  font-weight: bold;
+  border: none;
+  border-radius: 3px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.payment-details {
+  background: #f2f2f8;
+  padding: 24px 30px 20px 30px;
+  border-radius: 10px;
+  margin-bottom: 24px;
+  position: relative;
+}
+
+.pd-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+.btn-upload {
+  background: #377dfa;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  font-size: 1em;
+  box-shadow: 0 1px 5px rgba(180,186,250,0.24);
+}
+
+th, td {
+  border: 1px solid #e3e3e3;
+  text-align: center;
+  padding: 12px 6px;
+}
+
+th {
+  background: #e6e6ed;
+}
+
+.delete-btn {
+  cursor: pointer;
+  color: #c00;
+  font-size: 1.1em;
+}
+
+.summary-box {
+  background: #e6e6ed;
+  margin-top: 18px;
+  padding: 10px 30px;
+  border-radius: 7px;
+  display: flex;
+  justify-content: flex-start;
+  gap: 60px;
+  font-weight: bold;
+}
+
+.button-row {
+  margin: 24px 0 0 0;
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+
+.btn-main {
+  background: #2769e7;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 24px;
+  font-size: 1em;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.footer {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: #e6e6ed;
+  display: flex;
+  padding: 10px 30px;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+.footer-help {
+  margin-right: 20px;
+}
+.footer-next {
+  margin-left: 14px;
+}
+
