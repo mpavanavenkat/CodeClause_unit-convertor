@@ -49,504 +49,65 @@
 
 
 
-CustomerDetails.js
+import React from "react";
 
-import React from 'react';
-
-const CustomerDetails = ({ customer }) => {
-  if (!customer) {
-    return <div><h3>Customer Details</h3><p>Select a customer to view details.</p></div>;
-  }
-  return (
-    <div>
-      <h3>Customer Details</h3>
-      <p><strong>ID :</strong> {customer.id}</p>
-      <p><strong>First Name :</strong> {customer.firstName}</p>
-      <p><strong>Last Name :</strong> {customer.lastName}</p>
-      <p><strong>Email :</strong> {customer.email}</p>
-    </div>
-  );
-};
-
-export default CustomerDetails;
-
-CustomerForm.js
-
-import React, { useState } from 'react';
-
-const CustomerForm = ({ onAddCustomer }) => {
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: ''
-  });
-
-  const handleChange = (e) => {
-    setFormData({...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = (e) => {
-  e.preventDefault();
-  if (
-    formData.firstName &&
-    formData.lastName &&
-    formData.email &&
-    formData.email.endsWith("@gmail.com")
-  ) {
-    onAddCustomer(formData);
-    setFormData({ firstName: "", lastName: "", email: "" });
-  } else {
-    alert("Please enter a valid Gmail address (ending with @gmail.com).");
+// Add more accounts/bank details if needed
+const accountDetails = {
+  "1": {
+    label: "Salary Account",
+    bank: "Standard Chartered Bank",
+    number: "XXXX-1234-5678",
+    desc: "Used for salary payouts and regular payroll batches."
+  },
+  "2": {
+    label: "Savings Account",
+    bank: "Standard Chartered Bank",
+    number: "XXXX-9876-5432",
+    desc: "Used for miscellaneous payments and ad hoc payroll batches."
   }
 };
 
+const BatchAccountInfo = ({ debitAccount }) => {
+  const details = accountDetails[debitAccount];
 
   return (
-    <div>
-      <h3>Add Customer</h3>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>First Name</label><br />
-          <input name="firstName" value={formData.firstName} onChange={handleChange} />
+    <div className="card shadow-sm border-primary mb-4" style={{ borderRadius: "18px", maxWidth: "430px", margin: "0 auto" }}>
+      <div className="card-body d-flex flex-column gap-2">
+        <h6 className="fw-bold text-secondary mb-2">
+          Batch will debit from:
+        </h6>
+        <div className="fs-5 text-primary mb-1">
+          {details ? details.label : "Not selected"}
         </div>
-        <div>
-          <label>Last Name</label><br />
-          <input name="lastName" value={formData.lastName} onChange={handleChange} />
-        </div>
-        <div>
-          <label>Email</label><br />
-          <input name="email" value={formData.email} onChange={handleChange} />
-        </div><br />
-        <button type="submit">Submit</button>
-      </form>
-    </div>
-  );
-};
-
-export default CustomerForm;
-
-CustomerList.js
-
-import React from 'react';
-
-const CustomerList = ({ customers, onSelect }) => {
-  return (
-    <div>
-      <h3>Customers List</h3>
-      <table border="1" cellPadding="5" cellSpacing="0" style={{ borderCollapse: 'collapse', width: '100%' }}>
-        <thead>
-          <tr style={{ backgroundColor: '#f0f0f0' }}>
-            <th>Id</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Email</th>
-          </tr>
-        </thead>
-        <tbody>
-          {customers.map((cust) => (
-            <tr 
-              key={cust.id} 
-              onClick={() => onSelect(cust)} 
-              style={{ cursor: 'pointer' }} 
-              className="table-row"
-            >
-              <td>{cust.id}</td>
-              <td>{cust.firstName}</td>
-              <td>{cust.lastName}</td>
-              <td>{cust.email}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <style jsx>{`
-        .table-row:hover {
-          background-color: #d3d3d3;
-        }
-      `}</style>
-    </div>
-  );
-};
-
-export default CustomerList;
-
-App.js
-
-import React, { useState, useEffect } from "react";
-import CustomerList from "./components/CustomerList";
-import CustomerForm from "./components/CustomerForm";
-import CustomerDetails from "./components/CustomerDetails";
-import customersData from "./customers.json";
-
-const App = () => {
-  const [customers, setCustomers] = useState([]);
-  const [selectedCustomer, setSelectedCustomer] = useState(null);
-
-  useEffect(() => {
-    setCustomers(customersData);
-  }, []);
-
-  const handleSelectCustomer = (customer) => {
-    setSelectedCustomer(customer);
-  };
-
-  const handleAddCustomer = (newCustomer) => {
-    const newId = customers.length ? customers[customers.length - 1].id + 1 : 1;
-    const customerToAdd = { id: newId, ...newCustomer };
-    setCustomers([...customers, customerToAdd]);
-    setSelectedCustomer(customerToAdd);
-  };
-
-  return (
-    <div style={{ marginLeft: 50, marginRight: 50 }}>
-      <CustomerList customers={customers} onSelect={handleSelectCustomer} />
-      <div style={{ display: "flex", justifyContent: "space-between", marginTop: 20 }}>
-        <div style={{ width: "45%" }}>
-          <CustomerForm onAddCustomer={handleAddCustomer} />
-        </div>
-        <div style={{ width: "45%" }}>
-          <CustomerDetails customer={selectedCustomer} />
+        {details && (
+          <>
+            <div className="text-dark mb-1">
+              <span className="fw-semibold">Bank:&nbsp;</span>
+              {details.bank}
+            </div>
+            <div className="text-dark mb-1">
+              <span className="fw-semibold">Account Number:&nbsp;</span>
+              {details.number}
+            </div>
+          </>
+        )}
+        <div className="text-muted">
+          {details ? details.desc : "Select a debit account for this payroll batch."}
         </div>
       </div>
     </div>
   );
 };
 
-export default App;
-
-
-customers.json
-
-[
-  { "id": 1, "firstName": "Sundar", "lastName": "Pichai", "email": "sundar.pichai@google.com" },
-  { "id": 2, "firstName": "Satya", "lastName": "Nadella", "email": "satya.nadella@microsoft.com" },
-  { "id": 3, "firstName": "Jeff", "lastName": "Bezos", "email": "jeff.bezos@amazon.com" },
-  { "id": 4, "firstName": "Sergey", "lastName": "Brin", "email": "sergey.brin@google.com" },
-  { "id": 5, "firstName": "Larry", "lastName": "Page", "email": "larry.page@google.com" }
-]
-
-
-
-Wire frame code
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Payroll Payments</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <div class="navbar">
-    <span class="nav-back">&lt; Back</span>
-    <span class="nav-home">🏠 Straight2Bank</span>
-    <span class="nav-search">
-      <input type="text" placeholder="Search">
-    </span>
-    <span class="nav-user">Welcome User <span class="nav-avatar">👤</span></span>
-  </div>
-  <div class="main">
-    <h2 class="heading">Payroll Payments</h2>
-    <div class="instruction-box">
-      <div class="instruction-row">
-        <div class="form-group">
-          <label>Debit Account</label>
-          <select><option>Select</option></select>
-        </div>
-        <div class="form-group">
-          <label>Date</label>
-          <select><option>Select</option></select>
-        </div>
-        <div class="form-group">
-          <label>Payroll Type</label>
-          <button class="btn-domestic">Domestic</button>
-        </div>
-        <div class="form-group">
-          <label>Payment Currency</label>
-          <select><option>Select</option></select>
-        </div>
-      </div>
-    </div>
-    <div class="payment-details">
-      <div class="pd-header">
-        <span>Payment Details</span>
-        <button class="btn-upload">Upload File</button>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Employee ID</th>
-            <th>Name</th>
-            <th>Salary Amount</th>
-            <th>Currency</th>
-            <th>Account Number</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>101</td>
-            <td>John</td>
-            <td>50000</td>
-            <td>INR</td>
-            <td>12345678</td>
-            <td><span class="delete-btn">🗑</span></td>
-          </tr>
-          <tr>
-            <td>102</td>
-            <td>Alice</td>
-            <td>52000</td>
-            <td>INR</td>
-            <td>22334455</td>
-            <td><span class="delete-btn">🗑</span></td>
-          </tr>
-          <tr>
-            <td>103</td>
-            <td>Rahul</td>
-            <td>47000</td>
-            <td>INR</td>
-            <td>33445566</td>
-            <td><span class="delete-btn">🗑</span></td>
-          </tr>
-          <tr>
-            <td>104</td>
-            <td>Mary</td>
-            <td>51000</td>
-            <td>INR</td>
-            <td>44556677</td>
-            <td><span class="delete-btn">🗑</span></td>
-          </tr>
-          <tr>
-            <td>105</td>
-            <td>Vikram</td>
-            <td>48000</td>
-            <td>INR</td>
-            <td>55667788</td>
-            <td><span class="delete-btn">🗑</span></td>
-          </tr>
-          <tr>
-            <td>106</td>
-            <td>Linda</td>
-            <td>53000</td>
-            <td>INR</td>
-            <td>66778899</td>
-            <td><span class="delete-btn">🗑</span></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="summary-box">
-  <div>Total Employees: <span>6</span></div>
-  <div>Total Debit Amount: <span>301000</span></div>
-</div>
-
-<!-- Buttons directly below summary -->
-<div class="button-row">
-  <button class="btn-main">Submit for Approval</button>
-  <button class="btn-main">Save Draft</button>
-  <button class="btn-main">Clear Form</button>
-  <button class="btn-main">Cancel</button>
-</div>
-
-
-  <div class="footer">
-    <span>Menu</span>
-    <span></span>
-    <span class="footer-help">Help</span>
-    <span>Log Out</span>
-    <span class="footer-next">&rarr;</span>
-  </div>
-</body>
-</html>
-
-Css
-
-body {
-  background: #f3f3f9;
-  font-family: 'Segoe UI', Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-}
-
-.navbar {
-  background: #2769e7;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 30px;
-  font-size: 16px;
-  height: 60px;
-}
-
-.nav-back { margin-right: 20px; cursor: pointer; }
-.nav-home { font-weight: bold; margin-right: auto; margin-left: 20px; }
-.nav-search input { border-radius: 5px; border: none; padding: 5px 10px; }
-.nav-user { margin-left: 30px; }
-.nav-avatar { margin-left: 7px; }
-
-.main {
-  width: 85vw;
-  margin: 30px auto 0 auto;
-}
-
-.heading {
-  text-align: center;
-  color: #fff;
-  background: #347dfa;
-  margin: 0 auto 15px auto;
-  padding: 14px 0;
-  border-radius: 8px 8px 0 0;
-  font-size: 2rem;
-}
-
-.instruction-box {
-  background: #e6e6ed;
-  padding: 20px 30px 10px 30px;
-  border-radius: 10px;
-  margin-bottom: 25px;
-}
-
-.instruction-row {
-  display: flex;
-  gap: 30px;
-  align-items: flex-end;
-  flex-wrap: wrap;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 12px;
-}
-.form-group label {
-  font-weight: bold;
-  margin-bottom: 7px;
-}
-.form-group select, .form-group button {
-  padding: 7px;
-  border: 1px solid #aaa;
-  border-radius: 4px;
-}
-
-.btn-domestic {
-  background: #2869e7;
-  color: #fff;
-  font-weight: bold;
-  border: none;
-  border-radius: 3px;
-  padding: 8px 16px;
-  cursor: pointer;
-}
-
-.payment-details {
-  background: #f2f2f8;
-  padding: 24px 30px 20px 30px;
-  border-radius: 10px;
-  margin-bottom: 24px;
-  position: relative;
-}
-
-.pd-header {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 15px;
-  font-size: 1.1em;
-  font-weight: bold;
-}
-
-.btn-upload {
-  background: #377dfa;
-  color: #fff;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: #fff;
-  font-size: 1em;
-  box-shadow: 0 1px 5px rgba(180,186,250,0.24);
-}
-
-th, td {
-  border: 1px solid #e3e3e3;
-  text-align: center;
-  padding: 12px 6px;
-}
-
-th {
-  background: #e6e6ed;
-}
-
-.delete-btn {
-  cursor: pointer;
-  color: #c00;
-  font-size: 1.1em;
-}
-
-.summary-box {
-  background: #e6e6ed;
-  margin-top: 18px;
-  padding: 10px 30px;
-  border-radius: 7px;
-  display: flex;
-  justify-content: flex-start;
-  gap: 60px;
-  font-weight: bold;
-}
-
-.button-row {
-  margin: 24px 0 0 0;
-  display: flex;
-  gap: 16px;
-  justify-content: center;
-}
-
-.btn-main {
-  background: #2769e7;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  padding: 10px 24px;
-  font-size: 1em;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.footer {
-  position: fixed;
-  bottom: 0; left: 0; right: 0;
-  background: #e6e6ed;
-  display: flex;
-  padding: 10px 30px;
-  justify-content: space-between;
-  align-items: center;
-  font-weight: bold;
-  font-size: 1.1em;
-}
-.footer-help {
-  margin-right: 20px;
-}
-.footer-next {
-  margin-left: 14px;
-}
-
-
-project userstory3
+export default BatchAccountInfo;
 
 const NavBar = () => {
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm py-2">
       <div className="container-fluid">
-        {/* 1. Left: Bank Name */}
         <a className="navbar-brand fw-bold text-white" href="#">
           Straight2Bank
         </a>
-        {/* Hamburger menu for mobile */}
         <button
           className="navbar-toggler"
           type="button"
@@ -558,9 +119,7 @@ const NavBar = () => {
         >
           <span className="navbar-toggler-icon"></span>
         </button>
-        {/* Collapsible Navbar content */}
         <div className="collapse navbar-collapse" id="navbarContent">
-          {/* 2. Middle: Search Bar */}
           <form className="d-flex mx-auto" style={{ width: "300px" }}>
             <input
               className="form-control me-2"
@@ -572,16 +131,18 @@ const NavBar = () => {
               <i className="bi bi-search"></i>
             </button>
           </form>
-          {/* 3. Right: User Icon & Logout */}
           <div className="d-flex align-items-center gap-3 ms-auto">
-            <i
-              className="bi bi-person-circle text-white"
-              style={{ fontSize: "1.5rem" }}
-            ></i>
-            <button className="btn btn-outline-light fw-semibold" type="button">
-              Logout
-            </button>
-          </div>
+          {/* Welcome User with Profile Icon */}
+         <div className="d-flex align-items-center gap-2 px-2 bg-white rounded-pill shadow-sm">
+         <i className="bi bi-person-circle" style={{ fontSize: "1.4rem", color: "#1976d2" }}></i>
+         <span className="fw-semibold text-primary">Welcome, User</span>
+         </div>
+        {/* Logout Button */}
+        <button className="btn btn-outline-light fw-semibold ms-2" type="button">
+        Logout
+       </button>
+      </div>
+
         </div>
       </div>
     </nav>
@@ -590,51 +151,64 @@ const NavBar = () => {
 
 export default NavBar;
 
-
 const PayrollActions = ({ filters, employees, onClear, disabled }) => (
-  <div className="mt-4 d-flex flex-wrap justify-content-center gap-3">
+  <div className="mt-4 d-flex flex-wrap justify-content-center gap-3 border-top pt-3">
     <button className="btn btn-primary" disabled={disabled} onClick={() => alert('Submitted for Approval')}>Submit for Approval</button>
     <button className="btn btn-outline-secondary" disabled={disabled} onClick={() => alert('Saved as Draft')}>Save Draft</button>
     <button className="btn btn-danger" onClick={onClear}>Clear Form</button>
     <button className="btn btn-secondary" onClick={() => alert('Cancelled')}>Cancel</button>
   </div>
 );
+
 export default PayrollActions;
 
-
-// PayrollFilters.jsx
 const PayrollFilters = ({ filters, onChange }) => (
-  <div className="row my-2">
+  <div className="row g-3 my-3 p-3 border rounded-3 bg-light align-items-end">
     <div className="col-md-3">
-      <label>Debit Account</label>
-      <select className="form-control"
+      <label className="form-label fw-semibold">Debit Account</label>
+      <select
+        className="form-select"
         value={filters.debitAccount}
-        onChange={e => onChange({ debitAccount: e.target.value })}>
+        onChange={e => onChange({ debitAccount: e.target.value })}
+      >
         <option value="">Select</option>
         <option value="1">Salary account</option>
         <option value="2">Savings account</option>
       </select>
     </div>
     <div className="col-md-3">
-      <label>Date</label>
-      <input className="form-control" type="date"
+      <label className="form-label fw-semibold">Date</label>
+      <input
+        className="form-control"
+        type="date"
         value={filters.date}
-        onChange={e => onChange({ date: e.target.value })} />
+        onChange={e => onChange({ date: e.target.value })}
+      />
     </div>
     <div className="col-md-3">
-      <label>Payroll Type</label>
-      <div>
-        <button className={`btn btn-sm ${filters.payrollType === "Domestic" ? "btn-primary" : "btn-outline-secondary"}`}
-          onClick={() => onChange({ payrollType: "Domestic" })}>Domestic</button>
-        <button className={`btn btn-sm ms-2 ${filters.payrollType === "Foreign" ? "btn-primary" : "btn-outline-secondary"}`}
-          onClick={() => onChange({ payrollType: "Foreign" })}>Foreign</button>
+      <label className="form-label fw-semibold">Payroll Type</label>
+      <div className="btn-group w-100">
+        <button
+          className={`btn btn-sm ${filters.payrollType === "Domestic" ? "btn-primary" : "btn-outline-secondary"}`}
+          onClick={() => onChange({ payrollType: "Domestic" })}
+        >
+          Domestic
+        </button>
+        <button
+          className={`btn btn-sm ${filters.payrollType === "Foreign" ? "btn-primary" : "btn-outline-secondary"}`}
+          onClick={() => onChange({ payrollType: "Foreign" })}
+        >
+          Foreign
+        </button>
       </div>
     </div>
     <div className="col-md-3">
-      <label>Payment Currency</label>
-      <select className="form-control"
+      <label className="form-label fw-semibold">Payment Currency</label>
+      <select
+        className="form-select"
         value={filters.paymentCurrency}
-        onChange={e => onChange({ paymentCurrency: e.target.value })}>
+        onChange={e => onChange({ paymentCurrency: e.target.value })}
+      >
         <option value="">Select</option>
         <option value="INR">INR</option>
         <option value="USD">USD</option>
@@ -646,15 +220,420 @@ const PayrollFilters = ({ filters, onChange }) => (
 
 export default PayrollFilters;
 
+import React, { useState } from "react";
+import Navbar from "./Navbar";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+
+function PayrollManual() {
+  const [filters, setFilters] = useState({
+    debitAccount: "1",
+    date: new Date(),
+    payrollType: "Domestic",
+    paymentCurrency: "INR",
+  });
+  const [employees, setEmployees] = useState([]);
+  const [newEmployee, setNewEmployee] = useState({
+    id: "",
+    name: "",
+    salary: "",
+    currency: "INR",
+    accountNumber: "",
+  });
+  const [error, setError] = useState("");
+
+  const handleFiltersChange = (updated) =>
+    setFilters((prev) => ({ ...prev, ...updated }));
+
+  const handleAddEmployee = (e) => {
+    e.preventDefault();
+    if (
+      !newEmployee.id ||
+      !newEmployee.name ||
+      !newEmployee.salary ||
+      !newEmployee.accountNumber
+    ) {
+      setError("All fields are required.");
+      return;
+    }
+    if (employees.some((emp) => emp.id === newEmployee.id)) {
+      setError("An employee with this ID already exists.");
+      return;
+    }
+    setEmployees([...employees, newEmployee]);
+    setNewEmployee({
+      id: "",
+      name: "",
+      salary: "",
+      currency: "INR",
+      accountNumber: "",
+    });
+    setError("");
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "id" || name === "salary" || name === "accountNumber") {
+      if (/^\d*$/.test(value))
+        setNewEmployee((prev) => ({ ...prev, [name]: value }));
+    } else if (name === "name") {
+      if (/^[a-zA-Z\s]*$/.test(value))
+        setNewEmployee((prev) => ({ ...prev, [name]: value }));
+    } else {
+      setNewEmployee((prev) => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handleRemoveEmployee = (idx) =>
+    setEmployees(employees.filter((_, i) => i !== idx));
+
+  const totalAmount = employees.reduce(
+    (acc, emp) => acc + Number(emp.salary || 0),
+    0
+  );
+
+  let approverCount = 1;
+  if (totalAmount > 1000000 && totalAmount <= 5000000) {
+    approverCount = 2;
+  } else if (totalAmount > 5000000) {
+    approverCount = 3;
+  }
+
+  // Bank Account Info Card Content
+  const accountDetails = {
+    "1": {
+      label: "Salary Account",
+      bank: "Standard Chartered Bank",
+      number: "XXXX-1234-5678",
+      desc: "Used for salary payouts and regular payroll batches.",
+    },
+    "2": {
+      label: "Savings Account",
+      bank: "Standard Chartered Bank",
+      number: "XXXX-9876-5432",
+      desc: "Used for miscellaneous payments and ad hoc payroll batches.",
+    },
+  };
+  const acc = accountDetails[filters.debitAccount];
+
+  return (
+    <>
+      <Navbar />
+
+      <div className="container my-4">
+        <div className="p-4 bg-white shadow-sm rounded-3">
+          <header className="pb-3 mb-4 border-bottom">
+            <h2 className="text-primary fw-bold">Payroll Initiation</h2>
+            <p className="text-muted">
+              Create payment batches by entering employee details manually.
+            </p>
+          </header>
+
+          {/* Dashboard Top Row */}
+          <div className="row mb-3" style={{ minHeight: 285 }}>
+            {/* Left: Account info card */}
+            <div className="col-md-5 col-lg-4 d-flex align-items-stretch" style={{ paddingLeft: 0 }}>
+              <div className="w-100 h-100">
+                <div
+                  className="card border border-primary shadow-sm h-100"
+                  style={{ borderRadius: "18px" }}
+                >
+                  <div className="card-body">
+                    <div className="fw-bold text-secondary mb-2">Batch will debit from:</div>
+                    <div className="fs-5 text-primary">{acc ? acc.label : "Not selected"}</div>
+                    {acc && (
+                      <>
+                        <div className="text-dark mb-1">
+                          <span className="fw-semibold">Bank:</span>
+                          {" "}{acc.bank}
+                        </div>
+                        <div className="text-dark mb-1">
+                          <span className="fw-semibold">Account Number:</span>
+                          {" "}{acc.number}
+                        </div>
+                      </>
+                    )}
+                    <div className="text-muted mt-2">{acc ? acc.desc : "Select a debit account for this payroll batch."}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* Middle: Available balance */}
+            <div className="col-md-7 col-lg-8 d-flex flex-column gap-3">
+              <div className="w-100 ms-md-3">
+                {/* Available Balance Card */}
+                {filters.debitAccount && (
+                  <div
+                    className="card bg-light mb-3 border border-primary shadow-sm"
+                    style={{ borderRadius: "18px" }}
+                  >
+                    <div className="card-body py-3">
+                      <div className="fw-bold text-secondary mb-1">
+                        Available Balance
+                      </div>
+                      <div className="fs-4 text-success">₹6,50,000.00</div>
+                      <div className="text-muted">
+                        Updated: 14 Oct 2025, 09:30 AM IST
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {/* Recent Batches Card */}
+                <div
+                  className="card bg-white border border-primary shadow-sm"
+                  style={{ borderRadius: "18px" }}
+                >
+                  <div className="card-body py-3">
+                    <div className="fw-bold text-secondary mb-2">
+                      Recent Batches
+                    </div>
+                    <ul className="list-unstyled mb-0">
+                      <li>
+                        <span className="fw-semibold">11 Oct 2025:</span> ₹2,75,000.00 debited
+                      </li>
+                      <li>
+                        <span className="fw-semibold">05 Oct 2025:</span> ₹1,50,000.00 debited
+                      </li>
+                      <li>
+                        <span className="fw-semibold">30 Sep 2025:</span> ₹3,20,000.00 debited
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Filters row */}
+          <div className="row g-3 my-2 p-3 border rounded-3 bg-light align-items-end">
+            <div className="col-md-6 col-lg-3">
+              <label className="form-label fw-semibold">Debit Account</label>
+              <select
+                className="form-select"
+                value={filters.debitAccount}
+                onChange={(e) =>
+                  handleFiltersChange({ debitAccount: e.target.value })
+                }
+              >
+                <option value="">Select Account</option>
+                <option value="1">Account 1 - Savings</option>
+                <option value="2">Account 2 - Corporate</option>
+              </select>
+            </div>
+            <div className="col-md-6 col-lg-3">
+              <label className="form-label fw-semibold">Date</label>
+              <DatePicker
+                selected={filters.date}
+                onChange={(date) => handleFiltersChange({ date })}
+                className="form-control"
+                dateFormat="yyyy-MM-dd"
+              />
+            </div>
+            <div className="col-md-6 col-lg-3">
+              <label className="form-label fw-semibold">Payroll Type</label>
+              <div className="btn-group w-100">
+                <button
+                  className={`btn ${
+                    filters.payrollType === "Domestic"
+                      ? "btn-primary"
+                      : "btn-outline-secondary"
+                  }`}
+                  onClick={() => handleFiltersChange({ payrollType: "Domestic" })}
+                >
+                  Domestic
+                </button>
+                <button
+                  className={`btn ${
+                    filters.payrollType === "Foreign"
+                      ? "btn-primary"
+                      : "btn-outline-secondary"
+                  }`}
+                  onClick={() => handleFiltersChange({ payrollType: "Foreign" })}
+                >
+                  Foreign
+                </button>
+              </div>
+            </div>
+            <div className="col-md-6 col-lg-3">
+              <label className="form-label fw-semibold">Payment Currency</label>
+              <select
+                className="form-select"
+                value={filters.paymentCurrency}
+                onChange={(e) =>
+                  handleFiltersChange({ paymentCurrency: e.target.value })
+                }
+              >
+                <option value="">Select Currency</option>
+                <option value="INR">INR</option>
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Input Form */}
+          <div className="my-4 p-4 border rounded-3 bg-light shadow-sm">
+            <h5 className="mb-3 fw-semibold">Add Employee Manually</h5>
+            {error && <div className="alert alert-danger p-2">{error}</div>}
+            <form onSubmit={handleAddEmployee} className="row g-3 align-items-end">
+              <div className="col-sm-6 col-md-2">
+                <label className="form-label fw-semibold">Employee ID</label>
+                <input
+                  type="text"
+                  name="id"
+                  value={newEmployee.id}
+                  onChange={handleInputChange}
+                  className="form-control"
+                />
+              </div>
+              <div className="col-sm-6 col-md-3">
+                <label className="form-label fw-semibold">Employee Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  value={newEmployee.name}
+                  onChange={handleInputChange}
+                  className="form-control"
+                />
+              </div>
+              <div className="col-sm-6 col-md-2">
+                <label className="form-label fw-semibold">Salary</label>
+                <input
+                  type="text"
+                  name="salary"
+                  value={newEmployee.salary}
+                  onChange={handleInputChange}
+                  className="form-control"
+                />
+              </div>
+              <div className="col-sm-6 col-md-2">
+                <label className="form-label fw-semibold">Currency</label>
+                <select
+                  name="currency"
+                  value={newEmployee.currency}
+                  onChange={handleInputChange}
+                  className="form-select"
+                >
+                  <option>INR</option>
+                  <option>USD</option>
+                  <option>EUR</option>
+                </select>
+              </div>
+              <div className="col-md-3">
+                <label className="form-label fw-semibold">Account Number</label>
+                <input
+                  type="text"
+                  name="accountNumber"
+                  value={newEmployee.accountNumber}
+                  onChange={handleInputChange}
+                  className="form-control"
+                />
+              </div>
+              <div className="col-12 text-end">
+                <button type="submit" className="btn btn-primary">
+                  Add Employee
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div className="mt-4">
+            <div className="table-responsive rounded-3 overflow-hidden shadow-sm">
+              <table className="table table-bordered table-hover align-middle">
+                <thead className="table-light">
+                  <tr>
+                    <th>Employee ID</th>
+                    <th>Employee Name</th>
+                    <th>Salary Amount</th>
+                    <th>Currency</th>
+                    <th>Account Number</th>
+                    <th className="text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {employees.length > 0 ? (
+                    employees.map((e, idx) => (
+                      <tr key={idx}>
+                        <td>{e.id}</td>
+                        <td>{e.name}</td>
+                        <td>{parseFloat(e.salary || 0).toFixed(2)}</td>
+                        <td>{e.currency}</td>
+                        <td>{e.accountNumber}</td>
+                        <td className="text-center">
+                          <button
+                            className="btn btn-danger btn-sm"
+                            onClick={() => handleRemoveEmployee(idx)}
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="6" className="text-center text-muted py-4">
+                        No employee data. Please add employees.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+            <div className="d-flex justify-content-end gap-4 fw-bold mt-3 p-3 bg-light rounded-3">
+              <span>Total Employees: {employees.length}</span>
+              <span>Total Debit Amount: ₹{totalAmount.toFixed(2)}</span>
+              <span className={`badge bg-${approverCount === 1 ? 'primary' : approverCount === 2 ? 'warning' : 'danger'}`}>
+                Requires {approverCount} Approver{approverCount > 1 ? 's' : ''}
+              </span>
+            </div>
+          </div>
+
+          <div className="mt-4 d-flex flex-wrap justify-content-center gap-3 border-top pt-4">
+            <button
+              className="btn btn-success"
+              onClick={() =>
+                alert(
+                  `Submitted for approval.\nBatch requires ${approverCount} approver${approverCount > 1 ? 's' : ''}.`
+                )
+              }
+            >
+              Submit for Approval
+            </button>
+            <button
+              className="btn btn-outline-primary"
+              onClick={() => alert("Saved as Draft")}
+            >
+              Save Draft
+            </button>
+            <button
+              className="btn btn-danger"
+              onClick={() => setEmployees([])}
+            >
+              Clear All
+            </button>
+            <button
+              className="btn btn-secondary"
+              onClick={() => alert("Cancelled")}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+export default PayrollManual;
 
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import PayrollFilters from "./PayrollFilters";
 import PayrollTable from "./PayrollTable";
 import PayrollActions from "./PayrollActions";
 import UploadFile from "./UploadFile";
 import NavBar from "./Navbar";
-
-
+import BatchAccountInfo from "./BatchAccountInfo";
 
 const PayrollPayments = () => {
   const [filters, setFilters] = useState({
@@ -675,73 +654,143 @@ const PayrollPayments = () => {
   };
 
   const handleFileData = (rows) => {
-  if (!rows.length || !rows[0].id) {
-    setError("Invalid file format.");
-    return;
+    if (!rows.length || !rows[0].id) {
+      setError("Invalid file format.");
+      return;
+    }
+
+    let invalidRows = [];
+    if (filters.payrollType === "Domestic") {
+      invalidRows = rows.filter(
+        (row) =>
+          row.payrollType.trim().toLowerCase() !== "domestic" ||
+          row.currency.trim().toUpperCase() !== "INR"
+      );
+    } else if (filters.payrollType === "Foreign") {
+      invalidRows = rows.filter(
+        (row) =>
+          row.payrollType.trim().toLowerCase() !== "foreign" ||
+          row.currency.trim().toUpperCase() === "INR"
+      );
+    }
+
+    if (invalidRows.length > 0) {
+      setError("Rows must match Payroll Type, and for Foreign must NOT be INR.");
+      setEmployees([]);
+      return;
+    }
+
+    setEmployees(rows);
+    setError("");
+  };
+
+  const totalAmount = employees.reduce(
+    (acc, emp) => acc + Number(emp.salary || 0),
+    0
+  );
+  let approverCount = 1;
+  if (totalAmount > 1000000 && totalAmount <= 5000000) {
+    approverCount = 2;
+  } else if (totalAmount > 5000000) {
+    approverCount = 3;
   }
-
-  let invalidRows = [];
-  if (filters.payrollType === "Domestic") {
-    // Domestic must be INR, must match payment currency filter
-    invalidRows = rows.filter(
-      row =>
-        row.payrollType.trim().toLowerCase() !== "domestic" ||
-        row.currency.trim().toUpperCase() !== "INR"
-    );
-  } else if (filters.payrollType === "Foreign") {
-    // Foreign must not be INR, allows any other currency!
-    invalidRows = rows.filter(
-      row =>
-        row.payrollType.trim().toLowerCase() !== "foreign" ||
-        row.currency.trim().toUpperCase() === "INR"
-    );
-  }
-
-  if (invalidRows.length > 0) {
-    console.log("Invalid rows: ", invalidRows);
-    setError("Rows must match Payroll Type, and for Foreign must NOT be INR.");
-    setEmployees([]);
-    return;
-  }
-
-  setEmployees(rows);
-  setError("");
-};
-
-
-
-
-
-
-
 
   return (
-  <>
-    <NavBar />
-    <div className="container my-4 bg-white shadow-sm p-4">
-      <h2 className="bg-primary text-white p-2 rounded">Payroll Payments</h2>
-      <PayrollFilters filters={filters} onChange={handleFiltersChange} />
-      {!areFiltersValid && (
-        <div className="alert alert-warning mb-3">Please fill all filter fields before uploading Excel file.</div>
-      )}
-      {areFiltersValid && <UploadFile onData={handleFileData} />}
-      {error && <div className="alert alert-danger">{error}</div>}
-      <PayrollTable employees={employees} setEmployees={setEmployees} />
-      <PayrollActions
-        filters={filters}
-        employees={employees}
-        onClear={() => setEmployees([])}
-        disabled={!areFiltersValid || employees.length === 0}
-      />
-    </div>
-  </>
-);
+    <>
+      <NavBar />
+      <div className="container my-4 bg-white shadow-sm p-4 rounded-3">
+        <header className="pb-3 mb-4 border-bottom">
+          <h2 className="text-primary fw-bold">Payroll Initiation</h2>
+          <p className="text-muted">
+            Create payment batches by uploading employee details excel file.
+          </p>
+        </header>
 
+        {/* Stretch card in left column of the row */}
+        <div className="row mb-3" style={{ minHeight: 285 }}>
+  <div className="col-md-5 col-lg-4 d-flex align-items-stretch mt-4" style={{ paddingLeft: 0 }}>
+    <div className="w-100 h-100">
+      <BatchAccountInfo debitAccount={filters.debitAccount} />
+    </div>
+  </div>
+  <div className="col-md-7 col-lg-8 d-flex flex-column gap-3">
+    <div className="w-100 ms-md-3">
+      {filters.debitAccount && (
+        <div
+          className="card bg-light mb-3 border border-primary shadow-sm"
+          style={{ borderRadius: "18px" }}
+        >
+          <div className="card-body py-3">
+            <div className="fw-bold text-secondary mb-1">
+              Available Balance
+            </div>
+            <div className="fs-4 text-success">₹6,50,000.00</div>
+            <div className="text-muted">
+              Updated: 14 Oct 2025, 09:30 AM IST
+            </div>
+          </div>
+        </div>
+      )}
+      <div
+        className="card bg-white border border-primary shadow-sm"
+        style={{ borderRadius: "18px" }}
+      >
+        <div className="card-body py-3">
+          <div className="fw-bold text-secondary mb-2">
+            Recent Batches
+          </div>
+          <ul className="list-unstyled mb-0">
+            <li>
+              <span className="fw-semibold">11 Oct 2025:</span> ₹2,75,000.00 debited
+            </li>
+            <li>
+              <span className="fw-semibold">05 Oct 2025:</span> ₹1,50,000.00 debited
+            </li>
+            <li>
+              <span className="fw-semibold">30 Sep 2025:</span> ₹3,20,000.00 debited
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+        <div className="mb-3 text-end">
+          <Link className="btn btn-outline-primary btn-sm" to="/manual">
+            Switch to Manual Entry
+          </Link>
+        </div>
+        <PayrollFilters filters={filters} onChange={handleFiltersChange} />
+        {!areFiltersValid && (
+          <div className="alert alert-warning mb-3">
+            Please fill all filter fields before uploading Excel file.
+          </div>
+        )}
+        {areFiltersValid && <UploadFile onData={handleFileData} />}
+        {error && <div className="alert alert-danger">{error}</div>}
+        <PayrollTable employees={employees} setEmployees={setEmployees} />
+        {employees.length > 0 && (
+          <div className="d-flex justify-content-end gap-4 fw-bold mt-3 p-3 bg-light rounded-3">
+            <span>Total Debit Amount: ₹{totalAmount.toFixed(2)}</span>
+            <span className={`badge bg-${approverCount === 1 ? 'primary' : approverCount === 2 ? 'warning' : 'danger'}`}>
+              Requires {approverCount} Approver{approverCount > 1 ? 's' : ''}
+            </span>
+          </div>
+        )}
+        <PayrollActions
+          filters={filters}
+          employees={employees}
+          onClear={() => setEmployees([])}
+          disabled={!areFiltersValid || employees.length === 0}
+        />
+      </div>
+    </>
+  );
 };
+
 export default PayrollPayments;
 
-
-// PayrollTable.jsx
 const PayrollTable = ({ employees, setEmployees }) => {
   const handleRemove = (idx) => {
     setEmployees(employees.filter((_, i) => i !== idx));
@@ -749,7 +798,7 @@ const PayrollTable = ({ employees, setEmployees }) => {
 
   return (
     <div className="table-responsive">
-      <table className="table table-bordered">
+      <table className="table table-bordered table-hover align-middle rounded-3 overflow-hidden">
         <thead className="table-light">
           <tr>
             <th>Employee ID</th>
@@ -757,7 +806,7 @@ const PayrollTable = ({ employees, setEmployees }) => {
             <th>Salary Amount</th>
             <th>Currency</th>
             <th>Account Number</th>
-            <th>Actions</th>
+            <th className="text-center">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -766,26 +815,37 @@ const PayrollTable = ({ employees, setEmployees }) => {
                 <tr key={idx}>
                   <td>{e.id}</td>
                   <td>{e.name}</td>
-                  <td>{e.salary}</td>
+                  <td>{parseFloat(e.salary || 0).toFixed(2)}</td>
                   <td>{e.currency}</td>
                   <td>{e.accountNumber}</td>
-                  <td>
-                    <button className="btn btn-danger btn-sm" onClick={() => handleRemove(idx)}>Delete</button>
+                  <td className="text-center">
+                    <button
+                      className="btn btn-danger btn-sm"
+                      onClick={() => handleRemove(idx)}
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
               ))
-            : <tr><td colSpan="6" className="text-center">No data</td></tr>}
+            : (
+              <tr>
+                <td colSpan="6" className="text-center text-muted py-4">
+                  No data
+                </td>
+              </tr>
+            )}
         </tbody>
       </table>
-      <div className="fw-bold mt-2">
-        Total Employees: {employees.length} &nbsp; Total Debit Amount: {employees.reduce((a, e) => a + Number(e.salary || 0), 0)}
+      <div className="fw-bold mt-3 p-3 bg-light rounded-3 d-flex justify-content-end gap-4">
+        <span>Total Employees: {employees.length}</span>
+        <span>Total Debit Amount: {employees.reduce((a, e) => a + Number(e.salary || 0), 0).toFixed(2)}</span>
       </div>
     </div>
   );
 };
 
 export default PayrollTable;
-
 
 import React from "react";
 import * as XLSX from "xlsx";
@@ -815,17 +875,21 @@ const UploadFile = ({ onData }) => {
 
 export default UploadFile;
 
-
-// App.js
 import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import PayrollPayments from "./components/PayrollPayments";
+import PayrollManual from "./components/PayrollManual";
+
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
   return (
-    <div className="App">
-      <PayrollPayments />
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<PayrollPayments />} />
+        <Route path="/manual" element={<PayrollManual />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
