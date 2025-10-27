@@ -47,28 +47,52 @@
 </body>
 </html>
 
-
-
 import React from "react";
 
-// Add more accounts/bank details if needed
 const accountDetails = {
-  "1": {
+  INR: {
     label: "Salary Account",
     bank: "Standard Chartered Bank",
     number: "XXXX-1234-5678",
-    desc: "Used for salary payouts and regular payroll batches."
+    desc: "Used for salary payouts and regular payroll batches.",
+    availableBalance: "₹6,50,000.00",
+    lastUpdated: "14 Oct 2025, 09:30 AM IST",
+    recentBatches: [
+      { date: "11 Oct 2025", amount: "₹2,75,000.00" },
+      { date: "05 Oct 2025", amount: "₹1,50,000.00" },
+      { date: "30 Sep 2025", amount: "₹3,20,000.00" }
+    ]
   },
-  "2": {
-    label: "Savings Account",
-    bank: "Standard Chartered Bank",
-    number: "XXXX-9876-5432",
-    desc: "Used for miscellaneous payments and ad hoc payroll batches."
+  USD: {
+    label: "USD Payroll Account",
+    bank: "Standard Chartered Bank (NY)",
+    number: "XXXX-9999-8888",
+    desc: "Used for payroll in US Dollars. SWIFT-enabled.",
+    availableBalance: "$10,500.00",
+    lastUpdated: "14 Oct 2025, 09:30 AM IST",
+    recentBatches: [
+      { date: "11 Oct 2025", amount: "$4,000.00" },
+      { date: "05 Oct 2025", amount: "$2,000.00" },
+      { date: "30 Sep 2025", amount: "$6,000.00" }
+    ]
+  },
+  EUR: {
+    label: "Euro Payroll Account",
+    bank: "Standard Chartered Bank (Frankfurt)",
+    number: "XXXX-5678-4321",
+    desc: "For euro-denominated payroll. SEPA supported.",
+    availableBalance: "€8,200.00",
+    lastUpdated: "14 Oct 2025, 09:30 AM IST",
+    recentBatches: [
+      { date: "11 Oct 2025", amount: "€3,000.00" },
+      { date: "05 Oct 2025", amount: "€2,200.00" },
+      { date: "30 Sep 2025", amount: "€3,500.00" }
+    ]
   }
 };
 
-const BatchAccountInfo = ({ debitAccount }) => {
-  const details = accountDetails[debitAccount];
+const BatchAccountInfo = ({ paymentCurrency }) => {
+  const details = accountDetails[paymentCurrency];
 
   return (
     <div className="card shadow-sm border-primary mb-4" style={{ borderRadius: "18px", maxWidth: "430px", margin: "0 auto" }}>
@@ -92,7 +116,7 @@ const BatchAccountInfo = ({ debitAccount }) => {
           </>
         )}
         <div className="text-muted">
-          {details ? details.desc : "Select a debit account for this payroll batch."}
+          {details ? details.desc : "Select a payment currency for this payroll batch."}
         </div>
       </div>
     </div>
@@ -100,7 +124,77 @@ const BatchAccountInfo = ({ debitAccount }) => {
 };
 
 export default BatchAccountInfo;
+import React, { useEffect, useState } from "react";
 
+const BatchGrid = () => {
+  const [batches, setBatches] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    fetch("http://localhost:8080/api/batch/grid")
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch batches");
+        return res.json();
+      })
+      .then((data) => {
+        setBatches(data);
+        setLoading(false);
+      })
+      .catch(() => {
+        setError("Failed to load batch data from backend.");
+        setLoading(false);
+      });
+  }, []);
+
+  return (
+    <div className="card shadow-sm my-4 p-4">
+      <h4 className="fw-bold text-primary mb-3">All Payroll Batches</h4>
+      {loading && <div>Loading...</div>}
+      {error && <div className="alert alert-danger">{error}</div>}
+      {!loading && !error && (
+        <div className="table-responsive">
+          <table className="table table-bordered table-hover align-middle">
+            <thead className="table-light">
+              <tr>
+                <th>Batch Reference</th>
+                <th>Created By</th>
+                <th>Created At</th>
+                <th>No. of Payments</th>
+                <th>Max Debit Amount</th>
+                <th>Total Debit Amount</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {batches.length ? (
+                batches.map((batch, idx) => (
+                  <tr key={idx}>
+                    <td>{batch.batchReference}</td>
+                    <td>{batch.createdBy}</td>
+                    <td>{new Date(batch.createdAt).toLocaleString()}</td>
+                    <td>{batch.numberOfPayments}</td>
+                    <td>{batch.maxDebitAmount}</td>
+                    <td>{batch.totalDebitAmount}</td>
+                    <td>{batch.status}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="7" className="text-center text-muted">
+                    No batch data found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default BatchGrid;
 const NavBar = () => {
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm py-2">
@@ -150,7 +244,6 @@ const NavBar = () => {
 };
 
 export default NavBar;
-
 const PayrollActions = ({ filters, employees, onClear, disabled }) => (
   <div className="mt-4 d-flex flex-wrap justify-content-center gap-3 border-top pt-3">
     <button className="btn btn-primary" disabled={disabled} onClick={() => alert('Submitted for Approval')}>Submit for Approval</button>
@@ -161,7 +254,6 @@ const PayrollActions = ({ filters, employees, onClear, disabled }) => (
 );
 
 export default PayrollActions;
-
 const PayrollFilters = ({ filters, onChange }) => (
   <div className="row g-3 my-3 p-3 border rounded-3 bg-light align-items-end">
     <div className="col-md-3">
@@ -219,11 +311,14 @@ const PayrollFilters = ({ filters, onChange }) => (
 );
 
 export default PayrollFilters;
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "./Navbar";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import BatchAccountInfo from "./BatchAccountInfo";
+
+const CURRENCY_SYMBOLS = { INR: "₹", USD: "$", EUR: "€" };
+const INITIAL_BALANCE = { INR: 650000, USD: 10500, EUR: 8200 };
 
 function PayrollManual() {
   const [filters, setFilters] = useState({
@@ -241,18 +336,28 @@ function PayrollManual() {
     accountNumber: "",
   });
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [batchGrid, setBatchGrid] = useState([]);
+
+  useEffect(() => {
+    fetchBatchGrid();
+  }, []);
+
+  const fetchBatchGrid = () => {
+    fetch("http://localhost:8080/api/batch/grid")
+      .then((res) => res.json())
+      .then((data) => setBatchGrid(data));
+  };
 
   const handleFiltersChange = (updated) =>
     setFilters((prev) => ({ ...prev, ...updated }));
 
+  // For manual entry, enforce correct currency for current filters
   const handleAddEmployee = (e) => {
     e.preventDefault();
-    if (
-      !newEmployee.id ||
-      !newEmployee.name ||
-      !newEmployee.salary ||
-      !newEmployee.accountNumber
-    ) {
+    const { payrollType, paymentCurrency } = filters;
+    // Validation for manual entry
+    if (!newEmployee.id || !newEmployee.name || !newEmployee.salary || !newEmployee.accountNumber) {
       setError("All fields are required.");
       return;
     }
@@ -260,143 +365,138 @@ function PayrollManual() {
       setError("An employee with this ID already exists.");
       return;
     }
+    if (payrollType === "Domestic" && newEmployee.currency !== "INR") {
+      setError("For Domestic payroll, employee currency must be INR.");
+      return;
+    }
+    if (payrollType === "Foreign" && newEmployee.currency !== paymentCurrency) {
+      setError(`For Foreign payroll and currency ${paymentCurrency}, employee currency must be ${paymentCurrency}.`);
+      return;
+    }
     setEmployees([...employees, newEmployee]);
     setNewEmployee({
       id: "",
       name: "",
       salary: "",
-      currency: "INR",
+      currency: payrollType === "Domestic" ? "INR" : paymentCurrency,
       accountNumber: "",
     });
     setError("");
   };
 
+  // Prevent changing currency unless it matches current allowed, for better UX
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    if (name === "id" || name === "salary" || name === "accountNumber") {
-      if (/^\d*$/.test(value))
-        setNewEmployee((prev) => ({ ...prev, [name]: value }));
+    if (["id", "salary", "accountNumber"].includes(name)) {
+      if (/^\d*$/.test(value)) setNewEmployee((prev) => ({ ...prev, [name]: value }));
     } else if (name === "name") {
-      if (/^[a-zA-Z\s]*$/.test(value))
-        setNewEmployee((prev) => ({ ...prev, [name]: value }));
+      if (/^[a-zA-Z\s]*$/.test(value)) setNewEmployee((prev) => ({ ...prev, [name]: value }));
+    } else if (name === "currency") {
+      // Prevent changing to a currency that doesn't match filters
+      if (filters.payrollType === "Domestic" && value !== "INR") return;
+      if (filters.payrollType === "Foreign" && value !== filters.paymentCurrency) return;
+      setNewEmployee((prev) => ({ ...prev, [name]: value }));
     } else {
       setNewEmployee((prev) => ({ ...prev, [name]: value }));
     }
   };
 
-  const handleRemoveEmployee = (idx) =>
-    setEmployees(employees.filter((_, i) => i !== idx));
+  const handleRemoveEmployee = (idx) => setEmployees(employees.filter((_, i) => i !== idx));
 
-  const totalAmount = employees.reduce(
-    (acc, emp) => acc + Number(emp.salary || 0),
-    0
-  );
+  const totalAmount = employees.reduce((acc, emp) => acc + Number(emp.salary || 0), 0);
 
   let approverCount = 1;
-  if (totalAmount > 1000000 && totalAmount <= 5000000) {
-    approverCount = 2;
-  } else if (totalAmount > 5000000) {
-    approverCount = 3;
-  }
+  if (totalAmount > 1000000 && totalAmount <= 5000000) approverCount = 2;
+  else if (totalAmount > 5000000) approverCount = 3;
 
-  // Bank Account Info Card Content
-  const accountDetails = {
-    "1": {
-      label: "Salary Account",
-      bank: "Standard Chartered Bank",
-      number: "XXXX-1234-5678",
-      desc: "Used for salary payouts and regular payroll batches.",
-    },
-    "2": {
-      label: "Savings Account",
-      bank: "Standard Chartered Bank",
-      number: "XXXX-9876-5432",
-      desc: "Used for miscellaneous payments and ad hoc payroll batches.",
-    },
+  const selectedCurrency = filters.paymentCurrency || "INR";
+  const currencySymbol = CURRENCY_SYMBOLS[selectedCurrency];
+  const initialBalance = INITIAL_BALANCE[selectedCurrency];
+  const filteredBatches = batchGrid
+    .filter((b) => b.currency === selectedCurrency)
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  const totalDebited = filteredBatches.reduce((acc, batch) => acc + (batch.totalDebitAmount || 0), 0);
+  const availableBalance = (initialBalance - totalDebited).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const recentBatches = filteredBatches.slice(0, 3);
+
+  const handleSubmitForApproval = () => {
+    setSubmitting(true);
+    const batchData = {
+      batchReference: "BATCH" + Date.now(),
+      createdBy: "admin",
+      createdAt: new Date().toISOString(),
+      debitAccount: filters.debitAccount,
+      maxDebitAmount: 100000,
+      totalDebitAmount: totalAmount,
+      status: "PENDING",
+      payments: employees.map((emp) => ({
+        employeeId: emp.id,
+        employeeName: emp.name,
+        salaryAmount: Number(emp.salary),
+        currency: emp.currency,
+        employeeAccountNo: emp.accountNumber,
+        status: "PENDING",
+      })),
+      currency: selectedCurrency,
+    };
+
+    fetch("http://localhost:8080/api/batch", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(batchData),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to save batch!");
+        return res.json();
+      })
+      .then(() => {
+        alert("Batch submitted and saved to backend!");
+        setEmployees([]);
+        fetchBatchGrid();
+      })
+      .catch(() => {
+        alert("Error saving batch to backend! Please try again.");
+      })
+      .finally(() => setSubmitting(false));
   };
-  const acc = accountDetails[filters.debitAccount];
 
   return (
     <>
       <Navbar />
-
       <div className="container my-4">
         <div className="p-4 bg-white shadow-sm rounded-3">
           <header className="pb-3 mb-4 border-bottom">
             <h2 className="text-primary fw-bold">Payroll Initiation</h2>
-            <p className="text-muted">
-              Create payment batches by entering employee details manually.
-            </p>
+            <p className="text-muted">Create payment batches by entering employee details manually.</p>
           </header>
 
           {/* Dashboard Top Row */}
           <div className="row mb-3" style={{ minHeight: 285 }}>
-            {/* Left: Account info card */}
             <div className="col-md-5 col-lg-4 d-flex align-items-stretch" style={{ paddingLeft: 0 }}>
-              <div className="w-100 h-100">
-                <div
-                  className="card border border-primary shadow-sm h-100"
-                  style={{ borderRadius: "18px" }}
-                >
-                  <div className="card-body">
-                    <div className="fw-bold text-secondary mb-2">Batch will debit from:</div>
-                    <div className="fs-5 text-primary">{acc ? acc.label : "Not selected"}</div>
-                    {acc && (
-                      <>
-                        <div className="text-dark mb-1">
-                          <span className="fw-semibold">Bank:</span>
-                          {" "}{acc.bank}
-                        </div>
-                        <div className="text-dark mb-1">
-                          <span className="fw-semibold">Account Number:</span>
-                          {" "}{acc.number}
-                        </div>
-                      </>
-                    )}
-                    <div className="text-muted mt-2">{acc ? acc.desc : "Select a debit account for this payroll batch."}</div>
-                  </div>
-                </div>
-              </div>
+              <BatchAccountInfo paymentCurrency={filters.paymentCurrency} />
             </div>
-            {/* Middle: Available balance */}
             <div className="col-md-7 col-lg-8 d-flex flex-column gap-3">
               <div className="w-100 ms-md-3">
-                {/* Available Balance Card */}
-                {filters.debitAccount && (
-                  <div
-                    className="card bg-light mb-3 border border-primary shadow-sm"
-                    style={{ borderRadius: "18px" }}
-                  >
-                    <div className="card-body py-3">
-                      <div className="fw-bold text-secondary mb-1">
-                        Available Balance
-                      </div>
-                      <div className="fs-4 text-success">₹6,50,000.00</div>
-                      <div className="text-muted">
-                        Updated: 14 Oct 2025, 09:30 AM IST
-                      </div>
-                    </div>
-                  </div>
-                )}
-                {/* Recent Batches Card */}
-                <div
-                  className="card bg-white border border-primary shadow-sm"
-                  style={{ borderRadius: "18px" }}
-                >
+                <div className="card bg-light mb-3 border border-primary shadow-sm" style={{ borderRadius: "18px" }}>
                   <div className="card-body py-3">
-                    <div className="fw-bold text-secondary mb-2">
-                      Recent Batches
-                    </div>
+                    <div className="fw-bold text-secondary mb-1">Available Balance</div>
+                    <div className="fs-4 text-success">{currencySymbol}{availableBalance}</div>
+                    <div className="text-muted">{recentBatches.length ? new Date(recentBatches[0].createdAt).toLocaleString() : "N/A"}</div>
+                  </div>
+                </div>
+                <div className="card bg-white border border-primary shadow-sm" style={{ borderRadius: "18px" }}>
+                  <div className="card-body py-3">
+                    <div className="fw-bold text-secondary mb-2">Recent Batches</div>
                     <ul className="list-unstyled mb-0">
-                      <li>
-                        <span className="fw-semibold">11 Oct 2025:</span> ₹2,75,000.00 debited
-                      </li>
-                      <li>
-                        <span className="fw-semibold">05 Oct 2025:</span> ₹1,50,000.00 debited
-                      </li>
-                      <li>
-                        <span className="fw-semibold">30 Sep 2025:</span> ₹3,20,000.00 debited
-                      </li>
+                      {recentBatches.length === 0 ? (
+                        <li>No history.</li>
+                      ) : (
+                        recentBatches.map((item, idx) => (
+                          <li key={idx}>
+                            <span className="fw-semibold">{new Date(item.createdAt).toLocaleDateString()}:</span> {currencySymbol}{Number(item.totalDebitAmount).toLocaleString()} debited ({item.numberOfPayments} payments)
+                          </li>
+                        ))
+                      )}
                     </ul>
                   </div>
                 </div>
@@ -411,9 +511,7 @@ function PayrollManual() {
               <select
                 className="form-select"
                 value={filters.debitAccount}
-                onChange={(e) =>
-                  handleFiltersChange({ debitAccount: e.target.value })
-                }
+                onChange={(e) => handleFiltersChange({ debitAccount: e.target.value })}
               >
                 <option value="">Select Account</option>
                 <option value="1">Account 1 - Savings</option>
@@ -433,21 +531,13 @@ function PayrollManual() {
               <label className="form-label fw-semibold">Payroll Type</label>
               <div className="btn-group w-100">
                 <button
-                  className={`btn ${
-                    filters.payrollType === "Domestic"
-                      ? "btn-primary"
-                      : "btn-outline-secondary"
-                  }`}
+                  className={`btn ${filters.payrollType === "Domestic" ? "btn-primary" : "btn-outline-secondary"}`}
                   onClick={() => handleFiltersChange({ payrollType: "Domestic" })}
                 >
                   Domestic
                 </button>
                 <button
-                  className={`btn ${
-                    filters.payrollType === "Foreign"
-                      ? "btn-primary"
-                      : "btn-outline-secondary"
-                  }`}
+                  className={`btn ${filters.payrollType === "Foreign" ? "btn-primary" : "btn-outline-secondary"}`}
                   onClick={() => handleFiltersChange({ payrollType: "Foreign" })}
                 >
                   Foreign
@@ -459,9 +549,7 @@ function PayrollManual() {
               <select
                 className="form-select"
                 value={filters.paymentCurrency}
-                onChange={(e) =>
-                  handleFiltersChange({ paymentCurrency: e.target.value })
-                }
+                onChange={(e) => handleFiltersChange({ paymentCurrency: e.target.value })}
               >
                 <option value="">Select Currency</option>
                 <option value="INR">INR</option>
@@ -513,10 +601,12 @@ function PayrollManual() {
                   value={newEmployee.currency}
                   onChange={handleInputChange}
                   className="form-select"
+                  disabled={filters.payrollType === "Domestic" || filters.payrollType === "Foreign"}
                 >
-                  <option>INR</option>
-                  <option>USD</option>
-                  <option>EUR</option>
+                  {filters.payrollType === "Domestic" && <option>INR</option>}
+                  {filters.payrollType === "Foreign" && filters.paymentCurrency !== "" && (
+                    <option>{filters.paymentCurrency}</option>
+                  )}
                 </select>
               </div>
               <div className="col-md-3">
@@ -581,9 +671,14 @@ function PayrollManual() {
             </div>
             <div className="d-flex justify-content-end gap-4 fw-bold mt-3 p-3 bg-light rounded-3">
               <span>Total Employees: {employees.length}</span>
-              <span>Total Debit Amount: ₹{totalAmount.toFixed(2)}</span>
-              <span className={`badge bg-${approverCount === 1 ? 'primary' : approverCount === 2 ? 'warning' : 'danger'}`}>
-                Requires {approverCount} Approver{approverCount > 1 ? 's' : ''}
+              <span>
+                Total Debit Amount: {currencySymbol}
+                {Number(totalAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </span>
+              <span
+                className={`badge bg-${approverCount === 1 ? "primary" : approverCount === 2 ? "warning" : "danger"}`}
+              >
+                Requires {approverCount} Approver{approverCount > 1 ? "s" : ""}
               </span>
             </div>
           </div>
@@ -591,31 +686,10 @@ function PayrollManual() {
           <div className="mt-4 d-flex flex-wrap justify-content-center gap-3 border-top pt-4">
             <button
               className="btn btn-success"
-              onClick={() =>
-                alert(
-                  `Submitted for approval.\nBatch requires ${approverCount} approver${approverCount > 1 ? 's' : ''}.`
-                )
-              }
+              onClick={handleSubmitForApproval}
+              disabled={employees.length === 0 || submitting}
             >
-              Submit for Approval
-            </button>
-            <button
-              className="btn btn-outline-primary"
-              onClick={() => alert("Saved as Draft")}
-            >
-              Save Draft
-            </button>
-            <button
-              className="btn btn-danger"
-              onClick={() => setEmployees([])}
-            >
-              Clear All
-            </button>
-            <button
-              className="btn btn-secondary"
-              onClick={() => alert("Cancelled")}
-            >
-              Cancel
+              {submitting ? "Submitting..." : "Submit for Approval"}
             </button>
           </div>
         </div>
@@ -625,15 +699,16 @@ function PayrollManual() {
 }
 
 export default PayrollManual;
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import PayrollFilters from "./PayrollFilters";
 import PayrollTable from "./PayrollTable";
-import PayrollActions from "./PayrollActions";
 import UploadFile from "./UploadFile";
 import NavBar from "./Navbar";
 import BatchAccountInfo from "./BatchAccountInfo";
+
+const CURRENCY_SYMBOLS = { INR: "₹", USD: "$", EUR: "€" };
+const INITIAL_BALANCE = { INR: 26500000, USD: 1050000, EUR: 8200 };
 
 const PayrollPayments = () => {
   const [filters, setFilters] = useState({
@@ -644,6 +719,18 @@ const PayrollPayments = () => {
   });
   const [employees, setEmployees] = useState([]);
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [batchGrid, setBatchGrid] = useState([]);
+
+  useEffect(() => {
+    fetchBatchGrid();
+  }, []);
+
+  const fetchBatchGrid = () => {
+    fetch("http://localhost:8080/api/batch/grid")
+      .then((res) => res.json())
+      .then((data) => setBatchGrid(data));
+  };
 
   const areFiltersValid = Object.values(filters).every(Boolean);
 
@@ -667,15 +754,25 @@ const PayrollPayments = () => {
           row.currency.trim().toUpperCase() !== "INR"
       );
     } else if (filters.payrollType === "Foreign") {
+      // Accept only USD or only EUR, matching paymentCurrency
+      const expectedCurrency = filters.paymentCurrency.toUpperCase();
       invalidRows = rows.filter(
         (row) =>
           row.payrollType.trim().toLowerCase() !== "foreign" ||
-          row.currency.trim().toUpperCase() === "INR"
+          row.currency.trim().toUpperCase() !== expectedCurrency
       );
     }
 
     if (invalidRows.length > 0) {
-      setError("Rows must match Payroll Type, and for Foreign must NOT be INR.");
+      if (filters.payrollType === "Domestic") {
+        setError("Rows must match Payroll Type (Domestic) and Currency (INR).");
+      } else if (filters.payrollType === "Foreign") {
+        setError(
+          `Rows must match Payroll Type (Foreign) and Currency (${filters.paymentCurrency}).`
+        );
+      } else {
+        setError("Rows do not match the selected Payroll Type or Currency.");
+      }
       setEmployees([]);
       return;
     }
@@ -689,11 +786,65 @@ const PayrollPayments = () => {
     0
   );
   let approverCount = 1;
-  if (totalAmount > 1000000 && totalAmount <= 5000000) {
-    approverCount = 2;
-  } else if (totalAmount > 5000000) {
-    approverCount = 3;
-  }
+  if (totalAmount > 1000000 && totalAmount <= 5000000) approverCount = 2;
+  else if (totalAmount > 5000000) approverCount = 3;
+
+  const selectedCurrency = filters.paymentCurrency || "INR";
+  const currencySymbol = CURRENCY_SYMBOLS[selectedCurrency];
+  const initialBalance = INITIAL_BALANCE[selectedCurrency];
+  const filteredBatches = batchGrid
+    .filter((b) => b.currency === selectedCurrency)
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  const totalDebited = filteredBatches.reduce(
+    (acc, b) => acc + (b.totalDebitAmount || 0),
+    0
+  );
+  const availableBalance = (initialBalance - totalDebited).toLocaleString(
+    "en-IN",
+    { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+  );
+  const recentBatches = filteredBatches.slice(0, 3);
+
+  const handleSubmitForApproval = () => {
+    setSubmitting(true);
+    const batchData = {
+      batchReference: "BATCH" + Date.now(),
+      createdBy: "admin",
+      createdAt: new Date().toISOString(),
+      debitAccount: filters.debitAccount,
+      maxDebitAmount: 100000,
+      totalDebitAmount: totalAmount,
+      status: "PENDING",
+      payments: employees.map((emp) => ({
+        employeeId: emp.id,
+        employeeName: emp.name,
+        salaryAmount: Number(emp.salary),
+        currency: emp.currency,
+        employeeAccountNo: emp.accountNumber,
+        status: "PENDING",
+      })),
+      currency: selectedCurrency,
+    };
+
+    fetch("http://localhost:8080/api/batch", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(batchData),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to save batch!");
+        return res.json();
+      })
+      .then(() => {
+        alert("Batch submitted and saved to backend!");
+        setEmployees([]);
+        fetchBatchGrid();
+      })
+      .catch(() => {
+        alert("Error saving batch to backend. Please try again.");
+      })
+      .finally(() => setSubmitting(false));
+  };
 
   return (
     <>
@@ -706,91 +857,120 @@ const PayrollPayments = () => {
           </p>
         </header>
 
-        {/* Stretch card in left column of the row */}
+        {/* Dashboard Top Row */}
         <div className="row mb-3" style={{ minHeight: 285 }}>
-  <div className="col-md-5 col-lg-4 d-flex align-items-stretch mt-4" style={{ paddingLeft: 0 }}>
-    <div className="w-100 h-100">
-      <BatchAccountInfo debitAccount={filters.debitAccount} />
-    </div>
-  </div>
-  <div className="col-md-7 col-lg-8 d-flex flex-column gap-3">
-    <div className="w-100 ms-md-3">
-      {filters.debitAccount && (
-        <div
-          className="card bg-light mb-3 border border-primary shadow-sm"
-          style={{ borderRadius: "18px" }}
-        >
-          <div className="card-body py-3">
-            <div className="fw-bold text-secondary mb-1">
-              Available Balance
-            </div>
-            <div className="fs-4 text-success">₹6,50,000.00</div>
-            <div className="text-muted">
-              Updated: 14 Oct 2025, 09:30 AM IST
+          <div
+            className="col-md-5 col-lg-4 d-flex align-items-stretch mt-4"
+            style={{ paddingLeft: 0 }}
+          >
+            <BatchAccountInfo paymentCurrency={filters.paymentCurrency} />
+          </div>
+          <div className="col-md-7 col-lg-8 d-flex flex-column gap-3">
+            <div className="w-100 ms-md-3">
+              <div
+                className="card bg-light mb-3 border border-primary shadow-sm"
+                style={{ borderRadius: "18px" }}
+              >
+                <div className="card-body py-3">
+                  <div className="fw-bold text-secondary mb-1">
+                    Available Balance
+                  </div>
+                  <div className="fs-4 text-success">
+                    {currencySymbol}
+                    {availableBalance}
+                  </div>
+                  <div className="text-muted">
+                    {recentBatches.length
+                      ? new Date(recentBatches[0].createdAt).toLocaleString()
+                      : "N/A"}
+                  </div>
+                </div>
+              </div>
+              <div
+                className="card bg-white border border-primary shadow-sm"
+                style={{ borderRadius: "18px" }}
+              >
+                <div className="card-body py-3">
+                  <div className="fw-bold text-secondary mb-2">
+                    Recent Batches
+                  </div>
+                  <ul className="list-unstyled mb-0">
+                    {recentBatches.length === 0 ? (
+                      <li>No history.</li>
+                    ) : (
+                      recentBatches.map((item, idx) => (
+                        <li key={idx}>
+                          <span className="fw-semibold">
+                            {new Date(item.createdAt).toLocaleDateString()}:
+                          </span>{" "}
+                          {currencySymbol}
+                          {Number(item.totalDebitAmount).toLocaleString()} debited ({item.numberOfPayments} payments)
+                        </li>
+                      ))
+                    )}
+                  </ul>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      )}
-      <div
-        className="card bg-white border border-primary shadow-sm"
-        style={{ borderRadius: "18px" }}
-      >
-        <div className="card-body py-3">
-          <div className="fw-bold text-secondary mb-2">
-            Recent Batches
-          </div>
-          <ul className="list-unstyled mb-0">
-            <li>
-              <span className="fw-semibold">11 Oct 2025:</span> ₹2,75,000.00 debited
-            </li>
-            <li>
-              <span className="fw-semibold">05 Oct 2025:</span> ₹1,50,000.00 debited
-            </li>
-            <li>
-              <span className="fw-semibold">30 Sep 2025:</span> ₹3,20,000.00 debited
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
         <div className="mb-3 text-end">
           <Link className="btn btn-outline-primary btn-sm" to="/manual">
             Switch to Manual Entry
           </Link>
         </div>
+
         <PayrollFilters filters={filters} onChange={handleFiltersChange} />
+
         {!areFiltersValid && (
           <div className="alert alert-warning mb-3">
             Please fill all filter fields before uploading Excel file.
           </div>
         )}
+
         {areFiltersValid && <UploadFile onData={handleFileData} />}
         {error && <div className="alert alert-danger">{error}</div>}
         <PayrollTable employees={employees} setEmployees={setEmployees} />
         {employees.length > 0 && (
           <div className="d-flex justify-content-end gap-4 fw-bold mt-3 p-3 bg-light rounded-3">
-            <span>Total Debit Amount: ₹{totalAmount.toFixed(2)}</span>
-            <span className={`badge bg-${approverCount === 1 ? 'primary' : approverCount === 2 ? 'warning' : 'danger'}`}>
-              Requires {approverCount} Approver{approverCount > 1 ? 's' : ''}
+            <span>
+              Total Debit Amount: {currencySymbol}
+              {Number(totalAmount).toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+            </span>
+            <span
+              className={`badge bg-${
+                approverCount === 1
+                  ? "primary"
+                  : approverCount === 2
+                  ? "warning"
+                  : "danger"
+              }`}
+            >
+              Requires {approverCount} Approver
+              {approverCount > 1 ? "s" : ""}
             </span>
           </div>
         )}
-        <PayrollActions
-          filters={filters}
-          employees={employees}
-          onClear={() => setEmployees([])}
-          disabled={!areFiltersValid || employees.length === 0}
-        />
+
+        <div className="mt-4 d-flex flex-wrap justify-content-center gap-3 border-top pt-3">
+          <button
+            className="btn btn-success"
+            disabled={!areFiltersValid || employees.length === 0 || submitting}
+            onClick={handleSubmitForApproval}
+          >
+            {submitting ? "Submitting..." : "Submit for Approval"}
+          </button>
+        </div>
       </div>
     </>
   );
 };
 
 export default PayrollPayments;
-
 const PayrollTable = ({ employees, setEmployees }) => {
   const handleRemove = (idx) => {
     setEmployees(employees.filter((_, i) => i !== idx));
@@ -846,7 +1026,6 @@ const PayrollTable = ({ employees, setEmployees }) => {
 };
 
 export default PayrollTable;
-
 import React from "react";
 import * as XLSX from "xlsx";
 
@@ -874,11 +1053,11 @@ const UploadFile = ({ onData }) => {
 };
 
 export default UploadFile;
-
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import PayrollPayments from "./components/PayrollPayments";
 import PayrollManual from "./components/PayrollManual";
+import BatchGrid from "./components/BatchGrid";
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -888,9 +1067,488 @@ function App() {
       <Routes>
         <Route path="/" element={<PayrollPayments />} />
         <Route path="/manual" element={<PayrollManual />} />
+        <Route path="/batch-grid" element={<BatchGrid />} />
       </Routes>
     </BrowserRouter>
   );
 }
 
 export default App;
+
+
+
+package com.payrollbackend.controller;
+
+import com.payrollbackend.dto.PayrollBatchGridDTO;
+import com.payrollbackend.model.PayrollBatch;
+import com.payrollbackend.model.PayrollBatchPayment;
+import com.payrollbackend.service.PayrollBatchService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
+
+@CrossOrigin(origins = "http://localhost:3000")
+@RestController
+@RequestMapping("/api/batch")
+public class PayrollBatchController {
+
+    private final PayrollBatchService batchService;
+
+    @Autowired
+    public PayrollBatchController(PayrollBatchService batchService) {
+        this.batchService = batchService;
+    }
+
+    // CREATE a batch (with all payments)
+    @PostMapping
+    public PayrollBatch createBatch(@RequestBody PayrollBatch batch) {
+        return batchService.saveBatch(batch);
+    }
+
+    // GET all batches
+    @GetMapping
+    public List<PayrollBatch> getAllBatches() {
+        return batchService.getAllBatches();
+    }
+
+    // GET batch by batch reference (ID in table)
+    @GetMapping("/{reference}")
+    public PayrollBatch getBatchByReference(@PathVariable String reference) {
+        Optional<PayrollBatch> batchOpt = batchService.getBatchByReference(reference);
+        return batchOpt.orElse(null);
+    }
+
+    // GET all payments for batch
+    @GetMapping("/{reference}/payments")
+    public List<PayrollBatchPayment> getPaymentsByBatch(@PathVariable String reference) {
+        Optional<PayrollBatch> batchOpt = batchService.getBatchByReference(reference);
+        if (batchOpt.isPresent()) {
+            return batchOpt.get().getPayments();
+        }
+        return null;
+    }
+
+    @GetMapping("/grid")
+    public List<PayrollBatchGridDTO> gridEndpoint() {
+        return batchService.getBatchGridList();
+    }
+}
+
+package com.payrollbackend.dto;
+
+import java.time.LocalDateTime;
+
+public class PayrollBatchGridDTO {
+    private String batchReference;
+    private String createdBy;
+    private LocalDateTime createdAt;
+    private int numberOfPayments;
+    private Double maxDebitAmount;
+    private Double totalDebitAmount;
+    private String status;
+    private String currency;
+
+    public PayrollBatchGridDTO() {}
+
+    public PayrollBatchGridDTO(String batchReference, String createdBy, LocalDateTime createdAt, int numberOfPayments, Double maxDebitAmount, Double totalDebitAmount, String status, String currency) {
+        this.batchReference = batchReference;
+        this.createdBy = createdBy;
+        this.createdAt = createdAt;
+        this.numberOfPayments = numberOfPayments;
+        this.maxDebitAmount = maxDebitAmount;
+        this.totalDebitAmount = totalDebitAmount;
+        this.status = status;
+        this.currency = currency;
+    }
+
+    public String getBatchReference() {
+        return batchReference;
+    }
+
+    public void setBatchReference(String batchReference) {
+        this.batchReference = batchReference;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+
+    public Double getMaxDebitAmount() {
+        return maxDebitAmount;
+    }
+
+    public void setMaxDebitAmount(Double maxDebitAmount) {
+        this.maxDebitAmount = maxDebitAmount;
+    }
+
+    public Double getTotalDebitAmount() {
+        return totalDebitAmount;
+    }
+
+    public void setTotalDebitAmount(Double totalDebitAmount) {
+        this.totalDebitAmount = totalDebitAmount;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+    public int getNumberOfPayments() { return numberOfPayments; }
+    public void setNumberOfPayments(int numberOfPayments) { this.numberOfPayments = numberOfPayments; }
+
+    public String getCurrency() { return currency; }
+    public void setCurrency(String currency) { this.currency = currency; }
+
+// Getters and setters for all fields here
+}
+
+package com.payrollbackend.model;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Entity
+@Table(name = "payroll_batch")
+public class PayrollBatch {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "batch_reference", unique = true, nullable = false)
+    private String batchReference;
+
+    @Column(name = "created_by", nullable = false)
+    private String createdBy;
+
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "debit_account", nullable = false)
+    private String debitAccount;
+
+    @Column(name = "max_debit_amount", nullable = false)
+    private Double maxDebitAmount;
+
+    @Column(name = "total_debit_amount", nullable = false)
+    private Double totalDebitAmount;
+
+    @Column(name = "status", nullable = false)
+    private String status;
+
+    @Column(name = "currency", nullable = false)
+    private String currency;
+
+    @OneToMany(mappedBy = "batch", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<PayrollBatchPayment> payments;
+
+    public PayrollBatch() {}
+
+    // Getters and setters as before
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getBatchReference() { return batchReference; }
+    public void setBatchReference(String batchReference) { this.batchReference = batchReference; }
+
+    public String getCreatedBy() { return createdBy; }
+    public void setCreatedBy(String createdBy) { this.createdBy = createdBy; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public String getDebitAccount() { return debitAccount; }
+    public void setDebitAccount(String debitAccount) { this.debitAccount = debitAccount; }
+
+    public Double getMaxDebitAmount() { return maxDebitAmount; }
+    public void setMaxDebitAmount(Double maxDebitAmount) { this.maxDebitAmount = maxDebitAmount; }
+
+    public Double getTotalDebitAmount() { return totalDebitAmount; }
+    public void setTotalDebitAmount(Double totalDebitAmount) { this.totalDebitAmount = totalDebitAmount; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+
+    public List<PayrollBatchPayment> getPayments() { return payments; }
+    public void setPayments(List<PayrollBatchPayment> payments) { this.payments = payments; }
+
+    public String getCurrency() { return currency; }
+    public void setCurrency(String currency) { this.currency = currency; }
+}
+
+package com.payrollbackend.model;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "payroll_batch_payment")
+public class PayrollBatchPayment {
+    @Id
+
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "batch_id", nullable = false)
+    @JsonBackReference
+    private PayrollBatch batch;
+
+    @Column(name = "employee_id", nullable = false)
+    private String employeeId;
+
+    @Column(name = "employee_name", nullable = false)
+    private String employeeName;
+
+    @Column(name = "salary_amount", nullable = false)
+    private Double salaryAmount;
+
+    @Column(name = "currency", nullable = false)
+    private String currency;
+
+    @Column(name = "employee_account_no", nullable = false)
+    private String employeeAccountNo;
+
+    @Column(name = "status", nullable = false)
+    private String status;
+
+    public PayrollBatchPayment() {}
+
+    // Getters and setters
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public PayrollBatch getBatch() { return batch; }
+    public void setBatch(PayrollBatch batch) { this.batch = batch; }
+
+    public String getEmployeeId() { return employeeId; }
+    public void setEmployeeId(String employeeId) { this.employeeId = employeeId; }
+
+    public String getEmployeeName() { return employeeName; }
+    public void setEmployeeName(String employeeName) { this.employeeName = employeeName; }
+
+    public Double getSalaryAmount() { return salaryAmount; }
+    public void setSalaryAmount(Double salaryAmount) { this.salaryAmount = salaryAmount; }
+
+    public String getCurrency() { return currency; }
+    public void setCurrency(String currency) { this.currency = currency; }
+
+    public String getEmployeeAccountNo() { return employeeAccountNo; }
+    public void setEmployeeAccountNo(String employeeAccountNo) { this.employeeAccountNo = employeeAccountNo; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+}
+
+package com.payrollbackend.repository;
+
+import com.payrollbackend.model.PayrollBatchPayment;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+public interface PayrollBatchPaymentRepository extends JpaRepository<PayrollBatchPayment, Long> {
+    List<PayrollBatchPayment> findByBatch_BatchReference(String batchReference);
+
+}
+
+package com.payrollbackend.repository;
+
+import com.payrollbackend.model.PayrollBatch;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface PayrollBatchRepository extends JpaRepository<PayrollBatch, Long> {
+    PayrollBatch findByBatchReference(String batchReference);
+}
+
+package com.payrollbackend.service;
+
+import com.payrollbackend.model.PayrollBatch;
+import com.payrollbackend.model.PayrollBatchPayment;
+import com.payrollbackend.repository.PayrollBatchRepository;
+import com.payrollbackend.repository.PayrollBatchPaymentRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import com.payrollbackend.dto.PayrollBatchGridDTO;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@Service
+public class PayrollBatchService {
+
+    private final PayrollBatchRepository batchRepo;
+    private final PayrollBatchPaymentRepository paymentRepo;
+
+    @Autowired
+    public PayrollBatchService(PayrollBatchRepository batchRepo, PayrollBatchPaymentRepository paymentRepo) {
+        this.batchRepo = batchRepo;
+        this.paymentRepo = paymentRepo;
+    }
+
+    // Save a batch (with payments)
+    public PayrollBatch saveBatch(PayrollBatch batch) {
+        batch.setCreatedAt(LocalDateTime.now());
+        // Make sure all payments reference this batch
+        if (batch.getPayments() != null) {
+            for (PayrollBatchPayment payment : batch.getPayments()) {
+                payment.setBatch(batch);
+            }
+        }
+        return batchRepo.save(batch);
+    }
+
+    // Get all batches
+    public List<PayrollBatch> getAllBatches() {
+        return batchRepo.findAll();
+    }
+
+    // Find by batch reference (unique)
+    public Optional<PayrollBatch> getBatchByReference(String reference) {
+        return batchRepo.findAll().stream()
+                .filter(batch -> batch.getBatchReference().equals(reference))
+                .findFirst();
+    }
+
+    // Get all payments by batch reference
+    public List<PayrollBatchPayment> getPaymentsByBatch(PayrollBatch batch) {
+        return batch.getPayments();
+    }
+    public List<PayrollBatchGridDTO> getBatchGridList() {
+        return batchRepo.findAll().stream()
+                .map(batch -> new PayrollBatchGridDTO(
+                        batch.getBatchReference(),
+                        batch.getCreatedBy(),
+                        batch.getCreatedAt(),
+                        batch.getPayments() != null ? batch.getPayments().size() : 0,
+                        batch.getMaxDebitAmount(),
+                        batch.getTotalDebitAmount(),
+                        batch.getStatus(),
+                        batch.getCurrency())
+                )
+                .collect(Collectors.toList());
+    }
+
+}
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.1.4</version> <!-- use your Spring Boot version -->
+        <relativePath/>
+    </parent>
+
+    <groupId>com.example</groupId>
+    <artifactId>payroll-backend</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>payroll-backend</name>
+    <description>Payroll Backend</description>
+
+    <properties>
+        <java.version>17</java.version>
+    </properties>
+
+    <dependencies>
+        <!-- SPRING WEB -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <!-- SPRING JPA -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <!-- POSTGRESQL DRIVER -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- OPTIONAL: JWT SUPPORT FOR SPRING SECURITY (add if you plan to use JWT) -->
+        <!--
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>0.11.5</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>0.11.5</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>0.11.5</version>
+            <scope>runtime</scope>
+        </dependency>
+        -->
+        <!-- OPTIONAL: LOMBOK (for @Getter, @Setter, etc. in models) -->
+        <!--
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+        -->
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+
+spring.datasource.url=jdbc:postgresql://localhost:5432/postgres
+spring.datasource.username=postgres
+spring.datasource.password=Venkat@2003
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+spring.datasource.url=jdbc:postgresql://localhost:5432/postgres
+spring.datasource.username=postgres
+spring.datasource.password=Venkat@2003
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+
+
+
+
+
